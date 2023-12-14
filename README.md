@@ -43,3 +43,25 @@ sequenceDiagram
     Web ->> Server : 피드 관련 저장 요소 전달
     Server ->> DB : 신규 피드 저장 혹은 기존 피드 데이터 갱신
 ```
+
+# server 모듈 의존성
+
+## 실행 환경
+
+- java 17
+- spring-boot 3.1.6
+    - spring-data-jpa
+    - spring-web
+    - spring-security
+    - spring-configuration-processor
+    - spring-devtool
+    - spring-docker-compose
+- postgres 16
+- lombok
+
+## 테스트 환경
+
+- spring-boot 3.1.6
+    - spring-boot-test
+    - spring-security-test
+    - testcontainers
