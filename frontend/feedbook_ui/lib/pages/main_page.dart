@@ -70,6 +70,22 @@ class _AllFeedPageState extends State<AllFeedPage> {
             ],
           ),
         ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Simple Feed Book",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 50,
+                ),
+              ),
+              Text("Copyright. Guardjo"),
+            ],
+          ),
+        ),
       ),
     );
   }
