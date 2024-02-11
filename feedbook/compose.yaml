@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: 'postgres:16'
+    environment:
+      POSTGRES_DB: feedbook
+      POSTGRES_PASSWORD: manager0
+      POSTGRES_USER: manager
+      TZ: "Asia/Seoul"
+    ports:
+      - 5432:5432
