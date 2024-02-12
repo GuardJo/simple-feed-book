@@ -110,6 +110,23 @@ Server ->> Web : 응답 데이터 반환
 Web ->> User : 응답 데이터 가공 및 전달
 ```
 
+# 도메인 구조
+
+## 회원
+
+```mermaid
+erDiagram
+
+Account {
+    long id fk "식별키"
+    string username uk "사용자 아이디"
+    string password "암호화 된 비밀번호"
+    string nickname "사용자 이름"
+    datetime createAt "생성일자"
+    datetime modifedAt "수정일자"
+}
+```
+
 # server 모듈 의존성
 
 ## 실행 환경
