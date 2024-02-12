@@ -1,28 +1,32 @@
-import 'package:feedbook_ui/pages/signup_screen.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final String _appName = "Simple Feed Book";
+class _SignupPageState extends State<SignupPage> {
+  final String _appName = "Sign up";
+
   final _formKey = GlobalKey<FormState>();
 
   String _username = "";
   String _password = "";
+  String _nickname = "";
 
-  void _updateUserInfo() {
-    // TODO login API 연동하기
+  void _registUser() {
+    //TODO 회원가입 API 연동
     final form = _formKey.currentState;
+
     if (form!.validate()) {
       form.save();
     }
+    print(
+        "nickName : $_nickname, userName : $_username, password : $_password");
 
-    print("Username : $_username, Password : $_password");
+    Navigator.pop(context);
   }
 
   @override
@@ -50,11 +54,27 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        "Login",
+                        "Sign up",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 45,
                         ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: "Nickname",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter Nickname";
+                          }
+                          return null;
+                        },
+                        onSaved: (newValue) => _nickname = newValue!,
                       ),
                       const SizedBox(
                         height: 30,
@@ -93,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 30,
                       ),
                       ElevatedButton(
-                        onPressed: _updateUserInfo,
+                        onPressed: _registUser,
                         style: ButtonStyle(
                           backgroundColor: MaterialStateColor.resolveWith(
                               (states) => Colors.black),
@@ -101,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: const Padding(
                           padding: EdgeInsets.all(10),
                           child: Text(
-                            "Login",
+                            "Signup",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -109,22 +129,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return const SignupPage();
-                              },
-                            ),
-                          );
-                        },
-                        child: const Text("Sign up"),
                       ),
                     ],
                   ),
