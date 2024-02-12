@@ -33,79 +33,88 @@ class _LoginPageState extends State<LoginPage> {
         shadowColor: const Color(0xFF000000),
         elevation: 2,
       ),
-      body: Container(
-        alignment: Alignment.center,
-        child: SizedBox(
-          width: 400,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Login",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 45,
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: "Username",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter Username";
-                    }
-                    return null;
-                  },
-                  onSaved: (newValue) => _username = newValue!,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                TextFormField(
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: "Password",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter Password";
-                    }
-                    return null;
-                  },
-                  onSaved: (newValue) => _password = newValue!,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                ElevatedButton(
-                  onPressed: _updateUserInfo,
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith(
-                        (states) => Colors.black),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 100,
             ),
-          ),
+            Container(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 400,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Login",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 45,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: "Username",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter Username";
+                          }
+                          return null;
+                        },
+                        onSaved: (newValue) => _username = newValue!,
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: "Password",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter Password";
+                          }
+                          return null;
+                        },
+                        onSaved: (newValue) => _password = newValue!,
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ElevatedButton(
+                        onPressed: _updateUserInfo,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateColor.resolveWith(
+                              (states) => Colors.black),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
