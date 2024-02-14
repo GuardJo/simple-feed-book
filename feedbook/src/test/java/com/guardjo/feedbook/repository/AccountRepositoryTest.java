@@ -53,4 +53,17 @@ class AccountRepositoryTest {
 
 		assertThat(actual.getId()).isEqualTo(expected.getId());
 	}
+
+	@DisplayName("동일한 username으로 저장된 Account Entity 존재 여부 확인")
+	@Test
+	void test_existsUsername() {
+		String existsName = testAccounts.get(0).getUsername();
+		String notExistsName = "abcdefg";
+
+		boolean exists = accountRepository.existsByUsername(existsName);
+		boolean notExists = accountRepository.existsByUsername(notExistsName);
+
+		assertThat(exists).isTrue();
+		assertThat(notExists).isFalse();
+	}
 }
