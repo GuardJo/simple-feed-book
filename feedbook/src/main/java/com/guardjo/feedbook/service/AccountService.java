@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.guardjo.feedbook.exception.DuplicateUsernameException;
+import com.guardjo.feedbook.exception.EntityNotFoundException;
+import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.repository.AccountRepository;
 
@@ -40,5 +42,27 @@ public class AccountService {
 			.build();
 
 		accountRepository.save(newAccount);
+	}
+
+	/**
+	 * 주어진 username, password 에 해당하는 Account Entity를 반환한다.
+	 * @param username 사용자 아이디
+	 * @param password 사용자 비밀번호 (plain)
+	 * @return 해당하는 계정 Entity,
+	 * @throws com.guardjo.feedbook.exception.EntityNotFoundException 해당하는 아이디의 계정이 없을 때
+	 * @throws com.guardjo.feedbook.exception.WrongPasswordException 해당하는 계정의 비밀번호가 올바르지 않을 때
+	 */
+	@Transactional(readOnly = true)
+	public Account login(String username, String password) {
+		Account account = accountRepository.findByUsername(username)
+			.orElseThrow(() -> new EntityNotFoundException(Account.class, "username", username));
+
+		if (passwordEncoder.matches(password, account.getPassword())) {
+			log.info("Successes Login, nickname = {}", account.getNickname());
+			return account;
+		} else {
+			log.warn("Invalid Password");
+			throw new WrongPasswordException();
+		}
 	}
 }

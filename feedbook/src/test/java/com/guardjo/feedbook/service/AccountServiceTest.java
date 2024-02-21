@@ -3,6 +3,8 @@ package com.guardjo.feedbook.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.guardjo.feedbook.exception.DuplicateUsernameException;
+import com.guardjo.feedbook.exception.EntityNotFoundException;
+import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.util.TestDataGenerator;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
@@ -65,5 +70,54 @@ class AccountServiceTest {
 		assertThatCode(() -> accountService.createAccount(username, nickname, password)).isInstanceOf(DuplicateUsernameException.class);
 
 		then(accountRepository).should().existsByUsername(eq(username));
+	}
+
+	@DisplayName("회원 로그인 테스트 : 정상")
+	@Test
+	void test_login() {
+		Account expected = TestDataGenerator.account(1, "test");
+		String username = expected.getUsername();
+		String password = expected.getPassword();
+
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(expected));
+		given(passwordEncoder.matches(eq(password), eq(expected.getPassword()))).willReturn(true);
+
+		Account actual = accountService.login(username, password);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getId()).isEqualTo(expected.getId());
+
+		then(accountRepository).should().findByUsername(eq(username));
+		then(passwordEncoder).should().matches(eq(password), eq(expected.getPassword()));
+	}
+
+	@DisplayName("회원 로그인 테스트 : 아이디가 존재하지 않는 경우")
+	@Test
+	void test_login_not_found_account() {
+		Account expected = TestDataGenerator.account(1, "test");
+		String username = expected.getUsername();
+		String password = expected.getPassword();
+
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.empty());
+
+		assertThatCode(() -> accountService.login(username, password)).isInstanceOf(EntityNotFoundException.class);
+
+		then(accountRepository).should().findByUsername(eq(username));
+	}
+
+	@DisplayName("회원 로그인 테스트 : 비밀번호가 올바르지 않은 경우")
+	@Test
+	void test_login_wrong_password() {
+		Account expected = TestDataGenerator.account(1, "test");
+		String username = expected.getUsername();
+		String password = expected.getPassword();
+
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(expected));
+		given(passwordEncoder.matches(eq(password), eq(expected.getPassword()))).willReturn(false);
+
+		assertThatCode(() -> accountService.login(username, password)).isInstanceOf(WrongPasswordException.class);
+
+		then(accountRepository).should().findByUsername(eq(username));
+		then(passwordEncoder).should().matches(eq(password), eq(expected.getPassword()));
 	}
 }
