@@ -66,4 +66,15 @@ class AccountRepositoryTest {
 		assertThat(exists).isTrue();
 		assertThat(notExists).isFalse();
 	}
+
+	@DisplayName("특정 username에 대한 Account Entity 단건 조회")
+	@Test
+	void test_findByUsername() {
+		Account expected = testAccounts.get(0);
+
+		Account actual = accountRepository.findByUsername(expected.getUsername()).orElseThrow();
+
+		assertThat(actual.getId()).isEqualTo(expected.getId());
+		assertThat(actual.getUsername()).isEqualTo(expected.getUsername());
+	}
 }
