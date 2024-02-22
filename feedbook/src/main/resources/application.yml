@@ -12,3 +12,8 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+
+jwt:
+  secret: "Z3VhcmRqb3Rlc3RrZXk="
+  expired-time: 3600000 # 1시간
+  claim-key-name: "username"

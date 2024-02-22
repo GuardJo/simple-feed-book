@@ -9,3 +9,8 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+
+jwt:
+  secret: "dGVzdGtleQ==" # testkey
+  expired-time: 3600000 # 1시간
+  claim-key-name: "username"

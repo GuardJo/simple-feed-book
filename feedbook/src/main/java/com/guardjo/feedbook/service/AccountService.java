@@ -9,6 +9,7 @@ import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.util.JwtProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AccountService {
 	private final AccountRepository accountRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtProvider jwtProvider;
 
 	/**
 	 * 주어진 인자를 기반으로 신규 유저를 생성한다.
@@ -53,16 +55,20 @@ public class AccountService {
 	 * @throws com.guardjo.feedbook.exception.WrongPasswordException 해당하는 계정의 비밀번호가 올바르지 않을 때
 	 */
 	@Transactional(readOnly = true)
-	public Account login(String username, String password) {
+	public String login(String username, String password) {
 		Account account = accountRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(Account.class, "username", username));
 
 		if (passwordEncoder.matches(password, account.getPassword())) {
 			log.info("Successes Login, nickname = {}", account.getNickname());
-			return account;
+			return createJwtToken(account);
 		} else {
 			log.warn("Invalid Password");
 			throw new WrongPasswordException();
 		}
+	}
+
+	private String createJwtToken(Account account) {
+		return jwtProvider.createToken(account.getUsername());
 	}
 }

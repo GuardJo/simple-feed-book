@@ -19,6 +19,7 @@ import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.util.JwtProvider;
 import com.guardjo.feedbook.util.TestDataGenerator;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +28,8 @@ class AccountServiceTest {
 	private PasswordEncoder passwordEncoder;
 	@Mock
 	private AccountRepository accountRepository;
+	@Mock
+	private JwtProvider jwtProvider;
 
 	@InjectMocks
 	private AccountService accountService;
@@ -75,20 +78,23 @@ class AccountServiceTest {
 	@DisplayName("회원 로그인 테스트 : 정상")
 	@Test
 	void test_login() {
-		Account expected = TestDataGenerator.account(1, "test");
-		String username = expected.getUsername();
-		String password = expected.getPassword();
+		Account account = TestDataGenerator.account(1, "test");
+		String username = account.getUsername();
+		String password = account.getPassword();
+		String expected = "test-token";
 
-		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(expected));
-		given(passwordEncoder.matches(eq(password), eq(expected.getPassword()))).willReturn(true);
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(account));
+		given(passwordEncoder.matches(eq(password), eq(account.getPassword()))).willReturn(true);
+		given(jwtProvider.createToken(eq(account.getUsername()))).willReturn(expected);
 
-		Account actual = accountService.login(username, password);
+		String actual = accountService.login(username, password);
 
 		assertThat(actual).isNotNull();
-		assertThat(actual.getId()).isEqualTo(expected.getId());
+		assertThat(actual).isEqualTo(expected);
 
 		then(accountRepository).should().findByUsername(eq(username));
-		then(passwordEncoder).should().matches(eq(password), eq(expected.getPassword()));
+		then(passwordEncoder).should().matches(eq(password), eq(account.getPassword()));
+		then(jwtProvider).should().createToken(eq(account.getUsername()));
 	}
 
 	@DisplayName("회원 로그인 테스트 : 아이디가 존재하지 않는 경우")
