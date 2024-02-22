@@ -2,10 +2,12 @@ package com.guardjo.feedbook.controller;
 
 import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.guardjo.feedbook.controller.request.LoginRequest;
 import com.guardjo.feedbook.controller.request.SignupRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
 import com.guardjo.feedbook.service.AccountService;
@@ -34,5 +36,21 @@ public class AccountController {
 		accountService.createAccount(signupRequest.username(), signupRequest.nickname(), signupRequest.password());
 
 		return BaseResponse.defaultSuccesses();
+	}
+
+	@PostMapping(UrlContext.LOGIN_URL)
+	public BaseResponse<String> login(@RequestBody LoginRequest loginRequest) {
+		log.info("POST : {}, username = {}", UrlContext.LOGIN_URL, loginRequest.username());
+
+		if (!loginRequest.validate()) {
+			throw new IllegalArgumentException("Login Data is Wrong!");
+		}
+
+		String token = accountService.login(loginRequest.username(), loginRequest.password());
+
+		return BaseResponse.<String>builder()
+			.body(token)
+			.status(HttpStatus.OK.name())
+			.build();
 	}
 }
