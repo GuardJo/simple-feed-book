@@ -44,6 +44,89 @@ sequenceDiagram
     Server ->> DB : 신규 피드 저장 혹은 기존 피드 데이터 갱신
 ```
 
+## 회원가입 요청
+
+```mermaid
+sequenceDiagram
+actor User
+participant Web
+participant Server
+participant DB
+
+User ->> Web : 회원가입 요청
+Web ->> Server : 회원 가입 정보 전달
+Server ->> DB : 회원 정보 조회
+DB ->> Server : 기가입 회원 여부 반환
+Server ->> DB : 신규 회원 정보 저장
+Server -->> Web : 이미 가입된 회원 Exception 전달
+Server ->> Web : 신규회원 등록 완료
+Web ->> User : 가입 요청 결과 전달
+```
+
+## 로그인 요청
+
+```mermaid
+sequenceDiagram
+actor User
+participant Web
+participant Server
+participant DB
+
+User ->> Web : 로그인 요청
+Web ->> Server : 로그인 정보가 없을 시 로그인 요청
+Server ->> DB : 해당 회원 정보 조회
+
+DB -->> Server : 해당 회원을 찾지 못할 경우
+Server -->> Web : Unauthorization Exception
+Web -->> User : 로그인 오류 전달
+
+DB ->> Server : 조회된 회원 정보 전달
+Server ->> Server : JWT 토큰 생성
+Server ->> Web : 발급 토큰 반환
+Web ->> User : 토큰 저장
+```
+
+## 인증/인가 처리
+
+```mermaid
+sequenceDiagram
+actor User
+participant Web
+participant Server
+participant DB
+
+User ->> Web : 인증/인가 필요 요청
+Web ->> Server : 헤더 내 JWT 토큰 조회
+Server ->> Server : 토큰 복호화
+Server -->> Web : 복호화 실패 시 에러 전달
+Web -->> User : 인증/인가 오류 전달
+Server ->> DB : 복호화된 정보 기반으로 회원 조회
+DB -->> Server : 조회 실패 시
+Server -->> Web : 조회 실패 오류 전달
+Web -->> User : 인증/인가 오류 전달
+DB ->> Server : 조회된 회원 정보 반환
+Server ->> Server : 인증/인가 성공
+Server ->> Web : 응답 데이터 반환
+Web ->> User : 응답 데이터 가공 및 전달
+```
+
+# 도메인 구조
+
+## 회원
+
+```mermaid
+erDiagram
+
+Account {
+    long id fk "식별키"
+    string username uk "사용자 아이디"
+    string password "암호화 된 비밀번호"
+    string nickname "사용자 이름"
+    datetime createAt "생성일자"
+    datetime modifedAt "수정일자"
+}
+```
+
 # server 모듈 의존성
 
 ## 실행 환경

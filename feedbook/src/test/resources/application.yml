@@ -5,3 +5,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+jwt:
+  secret: "ODcUP84AFEZdnxGAsmlZkBzjEcyMTQ5N" # test key
+  expired-time: 3600000 # 1시간
+  claim-key-name: "username"

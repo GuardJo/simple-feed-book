@@ -4,3 +4,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/feedbook
     username: manager
     password: manager0
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  expired-time: 3600000 # 1시간
+  claim-key-name: "username"
