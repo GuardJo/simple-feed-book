@@ -1,14 +1,14 @@
+import 'package:feedbook_ui/pages/main_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const RootPage());
 }
 
-class MyApp extends StatelessWidget {
+class RootPage extends StatelessWidget {
   final String _appName = "Simple Feed Book";
-  const MyApp({super.key});
+  const RootPage({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,14 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(_appName),
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black,
-          elevation: 2,
-        ),
-      ),
+      home: const AllFeedPage(),
     );
   }
 }
