@@ -1,4 +1,6 @@
 import 'package:feedbook_ui/pages/login_screen.dart';
+import 'package:feedbook_ui/widgets/feed_widget.dart';
+import 'package:feedbook_ui/widgets/home_widget.dart';
 import 'package:flutter/material.dart';
 
 class AllFeedPage extends StatefulWidget {
@@ -12,10 +14,25 @@ class _AllFeedPageState extends State<AllFeedPage> {
   final String _appName = "Simple Feed Book";
 
   PageType pageType = PageType.allFeed;
+  Widget pageWidget = const HomeWidget();
 
   void _onTapUpdate(PageType pageType) {
     setState(() {
       pageType = pageType;
+
+      switch (pageType) {
+        case PageType.allFeed:
+          pageWidget = const HomeWidget();
+          break;
+        case PageType.myFeed:
+          pageWidget = const HomeWidget();
+          break;
+        case PageType.writeFeed:
+          pageWidget = const WriteFeedWidget();
+          break;
+        default:
+          pageWidget = const HomeWidget();
+      }
     });
   }
 
@@ -64,7 +81,7 @@ class _AllFeedPageState extends State<AllFeedPage> {
                 "Write Feed",
               ),
               onTap: () {
-                _onTapUpdate(PageType.allFeed);
+                _onTapUpdate(PageType.writeFeed);
                 Navigator.pop(context);
               },
             ),
@@ -79,22 +96,7 @@ class _AllFeedPageState extends State<AllFeedPage> {
           ],
         ),
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Simple Feed Book",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 50,
-              ),
-            ),
-            Text("Copyright. Guardjo"),
-          ],
-        ),
-      ),
+      body: pageWidget,
     );
   }
 }
