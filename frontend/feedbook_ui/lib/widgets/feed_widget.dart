@@ -23,13 +23,14 @@ class _WriteFeedWidgetState extends State<WriteFeedWidget> {
 
     if (formState!.validate()) {
       formState.save();
+
+      print("userId = $_userId, title = $_feedTitle, content = $_feedContent");
+
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (context) {
+        return const AllFeedPage();
+      }), (route) => false);
     }
-
-    print("userId = $_userId, title = $_feedTitle, content = $_feedContent");
-
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-      return const AllFeedPage();
-    }), (route) => false);
   }
 
   @override
