@@ -12,9 +12,12 @@ import com.guardjo.feedbook.exception.WrongPasswordException;
 
 import lombok.extern.slf4j.Slf4j;
 
-@RestControllerAdvice(basePackageClasses = AccountController.class)
+@RestControllerAdvice(basePackageClasses = {
+	AccountController.class,
+	FeedController.class
+})
 @Slf4j
-public class AccountControllerHandler extends ResponseEntityExceptionHandler {
+public class BaseControllerHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = {
 		IllegalArgumentException.class
 	})
