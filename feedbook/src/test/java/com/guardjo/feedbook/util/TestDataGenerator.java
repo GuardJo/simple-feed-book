@@ -31,4 +31,13 @@ public class TestDataGenerator {
 			.account(account)
 			.build();
 	}
+
+	public static Feed feed(long id, String title, String content, Account account) {
+		return Feed.builder()
+			.id(id)
+			.title(title)
+			.content(content)
+			.account(account)
+			.build();
+	}
 }
