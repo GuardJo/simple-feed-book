@@ -112,19 +112,31 @@ Web ->> User : 응답 데이터 가공 및 전달
 
 # 도메인 구조
 
-## 회원
+## ERD
 
 ```mermaid
+---
+title : simple-feed-book ERD
+---
 erDiagram
-
 Account {
-    long id fk "식별키"
+    long id pk "식별키"
     string username uk "사용자 아이디"
     string password "암호화 된 비밀번호"
     string nickname "사용자 이름"
     datetime createAt "생성일자"
     datetime modifedAt "수정일자"
 }
+Feed {
+    long id fk "식별키"
+    string title "피드 제목"
+    string content "피드 내용"
+    datetime createAt "생성일자"
+    datetime modifiedAt "수정일자"
+    long accountId fk "Account 식별키"
+}
+
+Account ||--o{ Feed : accountId
 ```
 
 # server 모듈 의존성

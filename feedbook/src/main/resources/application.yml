@@ -17,3 +17,4 @@ jwt:
   secret: ${JWT_SECRET_KEY}
   expired-time: 3600000 # 1시간
   claim-key-name: "username"
+  header-prefix: "Bearer "

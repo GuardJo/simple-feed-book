@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.guardjo.feedbook.config.JwtProperties;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -18,11 +19,13 @@ public class JwtProvider {
 	private final Key jwtSecret;
 	private final long expiredTime;
 	private final String claimKeyName;
+	private final String headerPrefix;
 
 	public JwtProvider(JwtProperties jwtProperties) {
 		this.jwtSecret = encodeKey(jwtProperties.secret());
 		this.expiredTime = jwtProperties.expiredTime();
 		this.claimKeyName = jwtProperties.claimKeyName();
+		this.headerPrefix = jwtProperties.headerPrefix();
 	}
 
 	/**
@@ -41,6 +44,39 @@ public class JwtProvider {
 			.setExpiration(new Date(now.getTime() + expiredTime))
 			.signWith(jwtSecret, SignatureAlgorithm.HS256)
 			.compact();
+	}
+
+	/**
+	 * 토큰 만료 여부 확인
+	 * @param token 만료 여부 확인할 JWT 토큰
+	 * @return 만료 여부
+	 */
+	public boolean isExpired(String token) {
+		Claims claims = getClaims(token);
+
+		return claims.getExpiration().before(new Date());
+	}
+
+	/**
+	 * 토큰 내 username 조회
+	 * @param token JWT 토큰
+	 * @return 토큰 내 사용자 식별값 반환
+	 */
+	public String getUsername(String token) {
+		Claims claims = getClaims(token);
+
+		return (String)claims.get(claimKeyName);
+	}
+
+	private Claims getClaims(String token) {
+		token = token.replace(headerPrefix, "");
+
+		JwtParser jwtParser = Jwts.parserBuilder()
+			.setSigningKey(this.jwtSecret)
+			.build();
+
+		return jwtParser.parseClaimsJws(token)
+			.getBody();
 	}
 
 	private Key encodeKey(String plainKey) {

@@ -50,14 +50,13 @@ public class AccountService {
 	 * 주어진 username, password 에 해당하는 Account Entity를 반환한다.
 	 * @param username 사용자 아이디
 	 * @param password 사용자 비밀번호 (plain)
-	 * @return 해당하는 계정 Entity,
+	 * @return 해당 계정에 대한 JWT 토큰
 	 * @throws com.guardjo.feedbook.exception.EntityNotFoundException 해당하는 아이디의 계정이 없을 때
 	 * @throws com.guardjo.feedbook.exception.WrongPasswordException 해당하는 계정의 비밀번호가 올바르지 않을 때
 	 */
 	@Transactional(readOnly = true)
 	public String login(String username, String password) {
-		Account account = accountRepository.findByUsername(username)
-			.orElseThrow(() -> new EntityNotFoundException(Account.class, "username", username));
+		Account account = findAccount(username);
 
 		if (passwordEncoder.matches(password, account.getPassword())) {
 			log.info("Successes Login, nickname = {}", account.getNickname());
@@ -66,6 +65,20 @@ public class AccountService {
 			log.warn("Invalid Password");
 			throw new WrongPasswordException();
 		}
+	}
+
+	/**
+	 * 주어진 ysername에 해당하는 Account Entity를 반환한다.
+	 * @param username 사용자 아이디
+	 * @return 해당하는 Entity
+	 * @throws com.guardjo.feedbook.exception.EntityNotFoundException 해당하는 아이디의 계정이 없을 때
+	 * @throws com.guardjo.feedbook.exception.WrongPasswordException 해당하는 계정의 비밀번호가 올바르지 않을 때
+	 */
+	public Account findAccount(String username) {
+		log.info("Find Account, username = {}", username);
+
+		return accountRepository.findByUsername(username)
+			.orElseThrow(() -> new EntityNotFoundException(Account.class, "username", username));
 	}
 
 	private String createJwtToken(Account account) {
