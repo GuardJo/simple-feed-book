@@ -1,4 +1,5 @@
 import 'package:feedbook_ui/pages/login_screen.dart';
+import 'package:feedbook_ui/widgets/feed_list_widget.dart';
 import 'package:feedbook_ui/widgets/feed_widget.dart';
 import 'package:feedbook_ui/widgets/home_widget.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class _AllFeedPageState extends State<AllFeedPage> {
 
       switch (pageType) {
         case PageType.allFeed:
-          pageWidget = const HomeWidget();
+          pageWidget = FeedListWidget();
           break;
         case PageType.myFeed:
           pageWidget = const HomeWidget();
