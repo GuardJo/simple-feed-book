@@ -3,6 +3,8 @@ package com.guardjo.feedbook.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.guardjo.feedbook.exception.EntityNotFoundException;
+import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.repository.FeedRepository;
@@ -29,6 +31,28 @@ public class FeedService {
 		feedRepository.save(newFeed);
 
 		log.info("Save New Feed, title = {}, id = {}", newFeed.getTitle(), newFeed.getId());
+	}
+
+	/**
+	 * <p>id에 해당하는 Feed의 title과 content를 갱신한다.</p>
+	 * <i>단, account가 본인이 일치한 경우에만 갱신함</i>
+	 * @param id Feed 식별키
+	 * @param title 갱신할 Feed의 제목
+	 * @param content 갱신할 Feed의 내용
+	 * @param account 갱신 요청 계정
+	 */
+	public void updateFeed(long id, String title, String content, Account account) {
+		Feed feed = feedRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Feed.class, id));
+
+		if (feed.getAccount().equals(account)) {
+			feed.setTitle(title);
+			feed.setContent(content);
+		} else {
+			log.warn("Invalid Update Feed, feedId = {}, account = {}", feed.getId(), account.getUsername());
+			throw new InvalidRequestException();
+		}
+
+		log.info("Updated Feed, feedId = {}", feed.getId());
 	}
 
 	private Feed createNewFeed(String title, String content, Account account) {
