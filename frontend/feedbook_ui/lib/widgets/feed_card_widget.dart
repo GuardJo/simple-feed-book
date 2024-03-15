@@ -1,10 +1,24 @@
 import 'package:feedbook_ui/models/feed_model.dart';
+import 'package:feedbook_ui/widgets/modify_feed_widget.dart';
 import 'package:flutter/material.dart';
 
 class FeedCard extends StatelessWidget {
   final Feed feed;
 
   const FeedCard({super.key, required this.feed});
+
+  void _showModifyingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (cotext) {
+        return Dialog(
+          child: ModifyFeedWidget(
+            feed: feed,
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +50,9 @@ class FeedCard extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _showModifyingDialog(context);
+                        },
                         icon: const Icon(Icons.edit_document),
                       ),
                       IconButton(
