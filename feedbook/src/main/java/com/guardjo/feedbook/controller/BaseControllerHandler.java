@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.guardjo.feedbook.controller.response.BaseResponse;
 import com.guardjo.feedbook.exception.DuplicateUsernameException;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
+import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,17 @@ public class BaseControllerHandler extends ResponseEntityExceptionHandler {
 		log.warn("Exception : Unauthorize, ", e);
 		return BaseResponse.<String>builder()
 			.status(HttpStatus.UNAUTHORIZED.name())
+			.body(e.getMessage())
+			.build();
+	}
+
+	@ExceptionHandler(value = {
+		InvalidRequestException.class
+	})
+	public BaseResponse<String> handleForbidden(Exception e) {
+		log.warn("Exception : Forbidden, ", e);
+		return BaseResponse.<String>builder()
+			.status(HttpStatus.FORBIDDEN.name())
 			.body(e.getMessage())
 			.build();
 	}

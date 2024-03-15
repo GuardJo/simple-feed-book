@@ -28,7 +28,9 @@ import com.guardjo.feedbook.config.SecurityConfig;
 import com.guardjo.feedbook.config.auth.AccountPrincipal;
 import com.guardjo.feedbook.config.auth.JwtAuthManager;
 import com.guardjo.feedbook.controller.request.FeedCreateRequest;
+import com.guardjo.feedbook.controller.request.FeedModifyRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
+import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.service.FeedService;
 import com.guardjo.feedbook.util.JwtProvider;
 import com.guardjo.feedbook.util.TestDataGenerator;
@@ -87,7 +89,7 @@ class FeedControllerTest {
 		then(feedService).should().saveFeed(eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
 	}
 
-	@DisplayName("POST : " + UrlContext.FEEDS_URL)
+	@DisplayName("POST : " + UrlContext.FEEDS_URL + " : 요청 데이터가 올바르지 않을 경우")
 	@Test
 	void test_createFeed_badRequest() throws Exception {
 		FeedCreateRequest request = new FeedCreateRequest(null, "content");
@@ -109,5 +111,88 @@ class FeedControllerTest {
 
 		assertThat(actual).isNotNull();
 		assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.name());
+	}
+
+	@DisplayName("PATCH : " + UrlContext.FEEDS_URL + " : 정상")
+	@Test
+	void test_updateFeed() throws Exception {
+		FeedModifyRequest request = new FeedModifyRequest(1L, "title", "content");
+		String token = "Bearer test-token";
+		String requestContent = objectMapper.writeValueAsString(request);
+
+		willDoNothing().given(feedService)
+			.updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(patch(UrlContext.FEEDS_URL)
+				.content(requestContent)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual).isEqualTo(BaseResponse.defaultSuccesses());
+
+		then(feedService).should().updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
+
+	}
+
+	@DisplayName("PATCH : " + UrlContext.FEEDS_URL + " : 잘못된 요청 데이터")
+	@Test
+	void test_updateFeed_BadRequest() throws Exception {
+		FeedModifyRequest request = new FeedModifyRequest(null, "title", "content");
+		String token = "Bearer test-token";
+		String requestContent = objectMapper.writeValueAsString(request);
+
+		String response = mockMvc.perform(patch(UrlContext.FEEDS_URL)
+				.content(requestContent)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.name());
+	}
+
+	@DisplayName("PATCH : " + UrlContext.FEEDS_URL + " : 권한 없는 사용자")
+	@Test
+	void test_updateFeed_Forbidden() throws Exception {
+		FeedModifyRequest request = new FeedModifyRequest(1L, "title", "content");
+		String token = "Bearer test-token";
+		String requestContent = objectMapper.writeValueAsString(request);
+
+		willThrow(InvalidRequestException.class).given(feedService)
+			.updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(patch(UrlContext.FEEDS_URL)
+				.content(requestContent)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.name());
+
+		then(feedService).should().updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
 	}
 }

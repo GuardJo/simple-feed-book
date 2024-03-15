@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
@@ -26,8 +27,10 @@ public class Feed extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Setter
 	@Column(nullable = false)
 	private String title;
+	@Setter
 	private String content;
 	@ManyToOne
 	@JoinColumn(name = "account_id")

@@ -3,6 +3,8 @@ package com.guardjo.feedbook.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.guardjo.feedbook.exception.EntityNotFoundException;
+import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.repository.FeedRepository;
@@ -45,5 +49,55 @@ class FeedServiceTest {
 		assertThat(saveFeed.getAccount().toString()).isEqualTo(account.toString());
 
 		then(feedRepository).should().save(any(Feed.class));
+	}
+
+	@DisplayName("기존 피드 수정 테스트")
+	@Test
+	void test_updateFeed() {
+		long feedId = 1L;
+		String title = "test";
+		String content = "modified";
+		Account account = TestDataGenerator.account(1L, "test123");
+		Feed oldFeed = TestDataGenerator.feed(feedId, "old title", "old content", account);
+
+		given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(oldFeed));
+
+		assertThatCode(() -> feedService.updateFeed(feedId, title, content, account)).doesNotThrowAnyException();
+
+		then(feedRepository).should().findById(eq(feedId));
+	}
+
+	@DisplayName("기존 피드 수정 테스트 : 기존 피드를 찾지 못했을 경우")
+	@Test
+	void test_updateFeed_NotFound() {
+		long feedId = 1L;
+		String title = "test";
+		String content = "modified";
+		Account account = TestDataGenerator.account(1L, "test123");
+
+		given(feedRepository.findById(eq(feedId))).willReturn(Optional.empty());
+
+		assertThatCode(() -> feedService.updateFeed(feedId, title, content, account))
+			.isInstanceOf(EntityNotFoundException.class);
+
+		then(feedRepository).should().findById(eq(feedId));
+	}
+
+	@DisplayName("기존 피드 수정 테스트 : 수정 권한이 없을 경우")
+	@Test
+	void test_updateFeed_Invalid() {
+		long feedId = 1L;
+		String title = "test";
+		String content = "modified";
+		Account requester = TestDataGenerator.account(1L, "test123");
+		Account account = TestDataGenerator.account(2L, "test111");
+		Feed oldFeed = TestDataGenerator.feed(feedId, "old title", "old content", account);
+
+		given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(oldFeed));
+
+		assertThatCode(() -> feedService.updateFeed(feedId, title, content, requester))
+			.isInstanceOf(InvalidRequestException.class);
+
+		then(feedRepository).should().findById(eq(feedId));
 	}
 }
