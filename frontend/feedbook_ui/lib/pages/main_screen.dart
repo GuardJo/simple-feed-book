@@ -23,7 +23,7 @@ class _AllFeedPageState extends State<AllFeedPage> {
 
       switch (pageType) {
         case PageType.allFeed:
-          pageWidget = FeedListWidget();
+          pageWidget = const FeedListWidget();
           break;
         case PageType.myFeed:
           pageWidget = const HomeWidget();
