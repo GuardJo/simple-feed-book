@@ -8,10 +8,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,6 +34,7 @@ import com.guardjo.feedbook.config.auth.JwtAuthManager;
 import com.guardjo.feedbook.controller.request.FeedCreateRequest;
 import com.guardjo.feedbook.controller.request.FeedModifyRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
+import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.service.FeedService;
 import com.guardjo.feedbook.util.JwtProvider;
@@ -167,14 +172,15 @@ class FeedControllerTest {
 		assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.name());
 	}
 
-	@DisplayName("PATCH : " + UrlContext.FEEDS_URL + " : 권한 없는 사용자")
-	@Test
-	void test_updateFeed_Forbidden() throws Exception {
+	@DisplayName("PATCH : " + UrlContext.FEEDS_URL + " : 예외 처리")
+	@ParameterizedTest
+	@MethodSource("handleExceptionData")
+	void test_updateFeed_Forbidden(Class<? extends Exception> exception, String responseStatus) throws Exception {
 		FeedModifyRequest request = new FeedModifyRequest(1L, "title", "content");
 		String token = "Bearer test-token";
 		String requestContent = objectMapper.writeValueAsString(request);
 
-		willThrow(InvalidRequestException.class).given(feedService)
+		willThrow(exception).given(feedService)
 			.updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
 
 		String response = mockMvc.perform(patch(UrlContext.FEEDS_URL)
@@ -191,8 +197,66 @@ class FeedControllerTest {
 		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
 
 		assertThat(actual).isNotNull();
-		assertThat(actual.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.name());
+		assertThat(actual.getStatus()).isEqualTo(responseStatus);
 
 		then(feedService).should().updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
+	}
+
+	@DisplayName("DELETE : " + UrlContext.FEEDS_URL + " : 정상")
+	@Test
+	void test_deleteFeed() throws Exception {
+		long feedId = 1L;
+		String token = "Bearer test-token";
+
+		willDoNothing().given(feedService).deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(delete(UrlContext.FEEDS_URL + "/" + feedId)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual).isEqualTo(BaseResponse.defaultSuccesses());
+
+		then(feedService).should().deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+	}
+
+	@DisplayName("DELETE : " + UrlContext.FEEDS_URL + " : 예외 처리")
+	@ParameterizedTest
+	@MethodSource("handleExceptionData")
+	void test_deleteFeed_NotFoundFeed(Class<? extends Exception> exception, String responseStatus) throws Exception {
+		long feedId = 1L;
+		String token = "Bearer test-token";
+
+		willThrow(exception).given(feedService).deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(delete(UrlContext.FEEDS_URL + "/" + feedId)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getStatus()).isEqualTo(responseStatus);
+
+		then(feedService).should().deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+	}
+
+	private static Stream<Arguments> handleExceptionData() {
+		return Stream.of(
+			Arguments.of(InvalidRequestException.class, HttpStatus.FORBIDDEN.name()),
+			Arguments.of(EntityNotFoundException.class, HttpStatus.NOT_FOUND.name())
+		);
 	}
 }

@@ -55,6 +55,25 @@ public class FeedService {
 		log.info("Updated Feed, feedId = {}", feed.getId());
 	}
 
+	/**
+	 * <p>특정 Feed를 삭제한다.</p>
+	 * <i>단, account가 본인이 일치한 경우에만 삭제함</i>
+	 * @param id Feed 식별키
+	 * @param account 삭제 요청자
+	 */
+	public void deleteFeed(long id, Account account) {
+		Feed feed = feedRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Feed.class, id));
+
+		if (feed.getAccount().equals(account)) {
+			feedRepository.delete(feed);
+		} else {
+			log.warn("Invalid Delete Feed, feedId = {}, account = {}", feed.getId(), account.getUsername());
+			throw new InvalidRequestException();
+		}
+
+		log.info("Deleted Feed, feedId = {}", id);
+	}
+
 	private Feed createNewFeed(String title, String content, Account account) {
 		return Feed.builder()
 			.title(title)

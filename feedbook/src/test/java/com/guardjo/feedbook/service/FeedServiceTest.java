@@ -100,4 +100,48 @@ class FeedServiceTest {
 
 		then(feedRepository).should().findById(eq(feedId));
 	}
+
+	@DisplayName("기존 피드 삭제 테스트 : 정상")
+	@Test
+	void test_deleteFeed() {
+		long feedId = 1L;
+		Account requester = TestDataGenerator.account(1L, "test123");
+		Feed deleteFeed = TestDataGenerator.feed(feedId, "title", "content", requester);
+
+		given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(deleteFeed));
+		willDoNothing().given(feedRepository).delete(eq(deleteFeed));
+
+		assertThatCode(() -> feedService.deleteFeed(feedId, requester)).doesNotThrowAnyException();
+
+		then(feedRepository).should().findById(eq(feedId));
+		then(feedRepository).should().delete(eq(deleteFeed));
+	}
+
+	@DisplayName("기존 피드 삭제 테스트 : 해당 피드를 찾지 못했을 경우")
+	@Test
+	void test_deleteFeed_NotFound() {
+		long feedId = 1L;
+		Account requester = TestDataGenerator.account(1L, "test123");
+
+		given(feedRepository.findById(eq(feedId))).willReturn(Optional.empty());
+
+		assertThatCode(() -> feedService.deleteFeed(feedId, requester)).isInstanceOf(EntityNotFoundException.class);
+
+		then(feedRepository).should().findById(eq(feedId));
+	}
+
+	@DisplayName("기존 피드 삭제 테스트 : 권한없는 요청자인 경우")
+	@Test
+	void test_deleteFeed_InvalidUser() {
+		long feedId = 1L;
+		Account requester = TestDataGenerator.account(1L, "test123");
+		Account owner = TestDataGenerator.account(2L, "owner");
+		Feed deleteFeed = TestDataGenerator.feed(feedId, "title", "content", owner);
+
+		given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(deleteFeed));
+
+		assertThatCode(() -> feedService.deleteFeed(feedId, requester)).isInstanceOf(InvalidRequestException.class);
+
+		then(feedRepository).should().findById(eq(feedId));
+	}
 }
