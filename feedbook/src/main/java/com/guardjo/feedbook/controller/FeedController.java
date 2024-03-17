@@ -1,7 +1,9 @@
 package com.guardjo.feedbook.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +50,15 @@ public class FeedController {
 		Account account = principal.getAccount();
 
 		feedService.updateFeed(feedModifyRequest.feedId(), feedModifyRequest.title(), feedModifyRequest.content(), account);
+
+		return BaseResponse.defaultSuccesses();
+	}
+
+	@DeleteMapping(UrlContext.FEEDS_URL + "/{feedId}")
+	public BaseResponse<String> deleteFeed(@PathVariable long feedId, @AuthenticationPrincipal AccountPrincipal principal) {
+		log.info("DELETE : {}/{}, username = {}", UrlContext.FEEDS_URL, feedId, principal.getUsername());
+
+		feedService.deleteFeed(feedId, principal.getAccount());
 
 		return BaseResponse.defaultSuccesses();
 	}

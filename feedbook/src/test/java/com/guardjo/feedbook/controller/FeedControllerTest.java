@@ -30,6 +30,7 @@ import com.guardjo.feedbook.config.auth.JwtAuthManager;
 import com.guardjo.feedbook.controller.request.FeedCreateRequest;
 import com.guardjo.feedbook.controller.request.FeedModifyRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
+import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.service.FeedService;
 import com.guardjo.feedbook.util.JwtProvider;
@@ -194,5 +195,80 @@ class FeedControllerTest {
 		assertThat(actual.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.name());
 
 		then(feedService).should().updateFeed(eq(request.feedId()), eq(request.title()), eq(request.content()), eq(TEST_PRINCIPAL.getAccount()));
+	}
+
+	@DisplayName("DELETE : " + UrlContext.FEEDS_URL + " : 정상")
+	@Test
+	void test_deleteFeed() throws Exception {
+		long feedId = 1L;
+		String token = "Bearer test-token";
+
+		willDoNothing().given(feedService).deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(delete(UrlContext.FEEDS_URL + "/" + feedId)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual).isEqualTo(BaseResponse.defaultSuccesses());
+
+		then(feedService).should().deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+	}
+
+	@DisplayName("DELETE : " + UrlContext.FEEDS_URL + " : 피드를 찾을 수 없는 경우")
+	@Test
+	void test_deleteFeed_NotFoundFeed() throws Exception {
+		long feedId = 1L;
+		String token = "Bearer test-token";
+
+		willThrow(EntityNotFoundException.class).given(feedService).deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(delete(UrlContext.FEEDS_URL + "/" + feedId)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.name());
+
+		then(feedService).should().deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+	}
+
+	@DisplayName("DELETE : " + UrlContext.FEEDS_URL + " : 권한 없는 사용자인 경우")
+	@Test
+	void test_deleteFeed_InvalidUser() throws Exception {
+		long feedId = 1L;
+		String token = "Bearer test-token";
+
+		willThrow(InvalidRequestException.class).given(feedService).deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(delete(UrlContext.FEEDS_URL + "/" + feedId)
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.name());
+
+		then(feedService).should().deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
 	}
 }
