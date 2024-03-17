@@ -7,6 +7,12 @@ class FeedCard extends StatelessWidget {
 
   const FeedCard({super.key, required this.feed});
 
+  void _submmitDeleteRequest(BuildContext context) {
+    // TODO 피드 삭제 요청 API 추가
+    print("Delete Feed, feedId = ${feed.id}");
+    Navigator.pop(context);
+  }
+
   void _showModifyingDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -18,6 +24,32 @@ class FeedCard extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Delete Feed"),
+            content: const Text("Deleting This Feed?"),
+            icon: const Icon(Icons.warning),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  _submmitDeleteRequest(context);
+                },
+                child: const Text("Yes"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("No"),
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -56,7 +88,9 @@ class FeedCard extends StatelessWidget {
                         icon: const Icon(Icons.edit_document),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _showDeleteDialog(context);
+                        },
                         icon: const Icon(
                           Icons.delete_forever,
                         ),
