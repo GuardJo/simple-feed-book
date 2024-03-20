@@ -61,15 +61,12 @@ class FeedServiceTest {
     void test_getAllFeed() {
         Account account = TestDataGenerator.account(1L, "test123");
 
-        int page = 1;
-        int size = 10;
-
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(1, 10);
         Page<Feed> expected = new PageImpl<>(List.of(TestDataGenerator.feed(1L, "test", "content", account)));
 
         given(feedRepository.findAll(eq(pageable))).willReturn(expected);
 
-        Page<Feed> actual = feedService.getAllFeeds(page, size, account);
+        Page<Feed> actual = feedService.getAllFeeds(pageable);
 
         assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);

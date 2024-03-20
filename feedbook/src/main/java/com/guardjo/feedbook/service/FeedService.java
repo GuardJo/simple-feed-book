@@ -8,7 +8,6 @@ import com.guardjo.feedbook.repository.FeedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,13 +37,10 @@ public class FeedService {
     /**
      * 저장되어 있는 전체 피드 목록을 페이징해서 반환한다.
      *
-     * @param page      페이지 번호
-     * @param size      페이지 당 표시 개수
-     * @param principal 요청 계정
+     * @param pageable 조회할 페이지 설정
      * @return 페이징된 Feed 목록
      */
-    public Page<Feed> getAllFeeds(int page, int size, Account principal) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Feed> getAllFeeds(Pageable pageable) {
 
         Page<Feed> feeds = feedRepository.findAll(pageable);
 
