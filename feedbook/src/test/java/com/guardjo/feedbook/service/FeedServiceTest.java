@@ -74,6 +74,24 @@ class FeedServiceTest {
         then(feedRepository).should().findAll(eq(pageable));
     }
 
+    @DisplayName("특정 사용자별 전체 피드 조회 테스트")
+    @Test
+    void test_getMyFeeds() {
+        Account account = TestDataGenerator.account(1L, "test123");
+
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Feed> expected = new PageImpl<>(List.of(TestDataGenerator.feed(1L, "test", "content", account)));
+
+        given(feedRepository.findAllByAccount(eq(pageable), eq(account))).willReturn(expected);
+
+        Page<Feed> actual = feedService.getMyFeeds(pageable, account);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(expected);
+
+        then(feedRepository).should().findAllByAccount(eq(pageable), eq(account));
+    }
+
     @DisplayName("기존 피드 수정 테스트")
     @Test
     void test_updateFeed() {

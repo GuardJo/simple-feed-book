@@ -50,6 +50,21 @@ public class FeedService {
     }
 
     /**
+     * 특정 계정이 작성한 전체 피드 모곩을 페이징해서 반환한다.
+     *
+     * @param pageable 조회할 페이지 설정
+     * @param account  작성자 계정
+     * @return 페이징된 Feed 목록
+     */
+    public Page<Feed> getMyFeeds(Pageable pageable, Account account) {
+        Page<Feed> feeds = feedRepository.findAllByAccount(pageable, account);
+
+        log.info("Found, My Feed List. totalPage = {}, totalSize = {}", feeds.getTotalPages(), feeds.getTotalElements());
+
+        return feeds;
+    }
+
+    /**
      * <p>id에 해당하는 Feed의 title과 content를 갱신한다.</p>
      * <i>단, account가 본인이 일치한 경우에만 갱신함</i>
      *
