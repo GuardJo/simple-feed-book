@@ -48,11 +48,24 @@ public class FeedController {
         Account account = principal.getAccount();
 
         Page<Feed> feeds = feedService.getAllFeeds(pageable);
-        List<FeedDto> feedDtos = feeds.stream()
-                .map(feed -> FeedDto.from(feed, account))
-                .toList();
 
-        FeedPageDto feedPageDto = new FeedPageDto(feedDtos, feeds.getTotalPages());
+        FeedPageDto feedPageDto = initFeedPageDto(feeds, account);
+
+        return BaseResponse.<FeedPageDto>builder()
+                .status(HttpStatus.OK.name())
+                .body(feedPageDto)
+                .build();
+    }
+
+    @GetMapping(UrlContext.MY_FEEDS_URL)
+    public BaseResponse<FeedPageDto> getMyFeedPage(@PageableDefault Pageable pageable, @AuthenticationPrincipal AccountPrincipal principal) {
+        log.info("GET : {}, username = {}", UrlContext.MY_FEEDS_URL, principal.getUsername());
+
+        Account account = principal.getAccount();
+
+        Page<Feed> feeds = feedService.getMyFeeds(pageable, account);
+
+        FeedPageDto feedPageDto = initFeedPageDto(feeds, account);
 
         return BaseResponse.<FeedPageDto>builder()
                 .status(HttpStatus.OK.name())
@@ -82,5 +95,13 @@ public class FeedController {
         feedService.deleteFeed(feedId, principal.getAccount());
 
         return BaseResponse.defaultSuccesses();
+    }
+
+    private FeedPageDto initFeedPageDto(Page<Feed> feeds, Account account) {
+        List<FeedDto> feedDtos = feeds.stream()
+                .map(feed -> FeedDto.from(feed, account))
+                .toList();
+
+        return new FeedPageDto(feedDtos, feeds.getTotalPages());
     }
 }

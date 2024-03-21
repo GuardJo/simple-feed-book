@@ -131,6 +131,36 @@ class FeedControllerTest {
         then(feedService).should().getAllFeeds(any(Pageable.class));
     }
 
+    @DisplayName("GET : " + UrlContext.MY_FEEDS_URL + " : 정상")
+    @Test
+    void test_getMyFeedPage() throws Exception {
+        String token = "Bearer test-token";
+
+        Feed feed = TestDataGenerator.feed(1L, "test", "content", TEST_PRINCIPAL.getAccount());
+        FeedDto expected = FeedDto.from(feed, TEST_PRINCIPAL.getAccount());
+        Page<Feed> feeds = new PageImpl<>(List.of(feed));
+
+        given(feedService.getMyFeeds(any(Pageable.class), eq(TEST_PRINCIPAL.getAccount()))).willReturn(feeds);
+
+        String response = mockMvc.perform(get(UrlContext.MY_FEEDS_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, token))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(BaseResponse.class, FeedPageDto.class);
+        BaseResponse<FeedPageDto> actual = objectMapper.readValue(response, javaType);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.OK.name());
+        assertThat(actual.getBody().feeds()).isEqualTo(List.of(expected));
+
+        then(feedService).should().getMyFeeds(any(Pageable.class), eq(TEST_PRINCIPAL.getAccount()));
+    }
+
     @DisplayName("POST : " + UrlContext.FEEDS_URL + " : 요청 데이터가 올바르지 않을 경우")
     @Test
     void test_createFeed_badRequest() throws Exception {
