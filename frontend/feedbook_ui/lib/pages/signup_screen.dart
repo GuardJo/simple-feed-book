@@ -1,3 +1,6 @@
+import 'package:feedbook_ui/models/base_response.dart';
+import 'package:feedbook_ui/models/signup_request.dart';
+import 'package:feedbook_ui/services/account_api_service.dart';
 import 'package:flutter/material.dart';
 
 class SignupPage extends StatefulWidget {
@@ -9,15 +12,14 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final String _appName = "Sign up";
-
+  final AccountApiService _accountApiCaller = AccountApiService();
   final _formKey = GlobalKey<FormState>();
 
   String _username = "";
   String _password = "";
   String _nickname = "";
 
-  void _registUser() {
-    //TODO 회원가입 API 연동
+  void _registUser() async {
     final form = _formKey.currentState;
 
     if (form!.validate()) {
@@ -26,6 +28,42 @@ class _SignupPageState extends State<SignupPage> {
     print(
         "nickName : $_nickname, userName : $_username, password : $_password");
 
+    BaseResponse response = await _accountApiCaller.signup(SignupRequest(
+      username: _username,
+      nickname: _nickname,
+      password: _password,
+    ));
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(response.body),
+      showCloseIcon: true,
+    ));
+
+    if (response.isOk()) {
+      _showSignupSuccessDialog();
+    }
+  }
+
+  void _showSignupSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: const Text("Signup Successes"),
+          actions: [
+            ElevatedButton(
+              onPressed: _backLoginPage,
+              child: const Text("Ok"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _backLoginPage() {
+    // dialog -> Signup Page -> Login Page
+    Navigator.pop(context);
     Navigator.pop(context);
   }
 
