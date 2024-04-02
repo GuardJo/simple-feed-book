@@ -1,5 +1,9 @@
+import 'package:feedbook_ui/models/base_response.dart';
+import 'package:feedbook_ui/pages/main_screen.dart';
 import 'package:feedbook_ui/pages/signup_screen.dart';
+import 'package:feedbook_ui/services/account_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,18 +15,72 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final String _appName = "Simple Feed Book";
   final _formKey = GlobalKey<FormState>();
+  final AccountApiService _accountApiCaller = AccountApiService();
+
+  late SharedPreferences preferences;
 
   String _username = "";
   String _password = "";
 
-  void _updateUserInfo() {
+  @override
+  void initState() {
+    super.initState();
+    _initPreferences();
+  }
+
+  Future<void> _initPreferences() async {
+    preferences = await SharedPreferences.getInstance();
+  }
+
+  void _updateUserInfo() async {
     // TODO login API 연동하기
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
     }
 
-    print("Username : $_username, Password : $_password");
+    BaseResponse response = await _accountApiCaller.login(_username, _password);
+
+    if (response.isOk()) {
+      String token = response.body;
+      preferences.setString("token", token);
+      _showSuccessDialog();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            response.body,
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: const Text("Login Successes"),
+          actions: [
+            ElevatedButton(
+              onPressed: () => {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const AllFeedPage();
+                    },
+                  ),
+                  (route) => false,
+                ),
+              },
+              child: const Text("Ok"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

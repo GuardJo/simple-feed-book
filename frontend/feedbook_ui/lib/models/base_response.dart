@@ -4,16 +4,16 @@ class BaseResponse {
 
   BaseResponse({
     required this.status,
-    required this.body
+    required this.body,
   });
 
-  BaseResponse.fromJson(Map<String, dynamic> json) :
-  status = json["status"],
-  body = json["body"];
+  BaseResponse.fromJson(Map<String, dynamic> json)
+      : status = json["status"],
+        body = json["body"];
 
-  BaseResponse.internalError() :
-  status = "ERROR",
-  body = "Internal Error";
+  BaseResponse.internalError()
+      : status = "ERROR",
+        body = "Internal Error";
 
   bool isOk() {
     if (status == "OK") {
