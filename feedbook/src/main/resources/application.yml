@@ -6,13 +6,18 @@ spring:
     password: manager0
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
     open-in-view: false
-
+  docker:
+    compose:
+      enabled: false
+  sql:
+    init:
+      mode: always
 jwt:
   secret: ${JWT_SECRET_KEY}
   expired-time: 3600000 # 1시간
