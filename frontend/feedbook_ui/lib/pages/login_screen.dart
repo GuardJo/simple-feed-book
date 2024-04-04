@@ -33,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _updateUserInfo() async {
-    // TODO login API 연동하기
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();

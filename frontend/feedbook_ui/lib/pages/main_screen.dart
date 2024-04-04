@@ -3,6 +3,7 @@ import 'package:feedbook_ui/widgets/feed_list_widget.dart';
 import 'package:feedbook_ui/widgets/feed_widget.dart';
 import 'package:feedbook_ui/widgets/home_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AllFeedPage extends StatefulWidget {
   const AllFeedPage({super.key});
@@ -13,28 +14,46 @@ class AllFeedPage extends StatefulWidget {
 
 class _AllFeedPageState extends State<AllFeedPage> {
   final String _appName = "Simple Feed Book";
+  late SharedPreferences sharedPreferences;
 
   PageType pageType = PageType.allFeed;
   Widget pageWidget = const HomeWidget();
 
-  void _onTapUpdate(PageType pageType) {
-    setState(() {
-      pageType = pageType;
+  @override
+  void initState() {
+    super.initState();
+    _initPreferences();
+  }
 
-      switch (pageType) {
-        case PageType.allFeed:
-          pageWidget = const FeedListWidget();
-          break;
-        case PageType.myFeed:
-          pageWidget = const HomeWidget();
-          break;
-        case PageType.writeFeed:
-          pageWidget = const WriteFeedWidget();
-          break;
-        default:
-          pageWidget = const HomeWidget();
-      }
-    });
+  Future<void> _initPreferences() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  void _onTapUpdate(PageType pageType) {
+    if (!sharedPreferences.containsKey("token")) {
+      _onTapGoToLoginPage();
+    } else {
+      setState(() {
+        String token = sharedPreferences.getString("token")!;
+
+        pageType = pageType;
+
+        switch (pageType) {
+          case PageType.allFeed:
+            pageWidget = const FeedListWidget();
+            break;
+          case PageType.myFeed:
+            pageWidget = const HomeWidget();
+            break;
+          case PageType.writeFeed:
+            pageWidget = WriteFeedWidget(token: token);
+            break;
+          default:
+            pageWidget = const HomeWidget();
+        }
+      });
+      Navigator.pop(context);
+    }
   }
 
   void _onTapGoToLoginPage() {
@@ -83,7 +102,6 @@ class _AllFeedPageState extends State<AllFeedPage> {
               ),
               onTap: () {
                 _onTapUpdate(PageType.writeFeed);
-                Navigator.pop(context);
               },
             ),
             ListBody(
