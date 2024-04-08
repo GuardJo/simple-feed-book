@@ -1,9 +1,14 @@
+import 'package:feedbook_ui/models/base_response.dart';
+import 'package:feedbook_ui/models/write_feed_request.dart';
 import 'package:feedbook_ui/pages/main_screen.dart';
+import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:flutter/material.dart';
 
 class WriteFeedWidget extends StatefulWidget {
+  final String token;
   const WriteFeedWidget({
     super.key,
+    required this.token,
   });
 
   @override
@@ -12,25 +17,59 @@ class WriteFeedWidget extends StatefulWidget {
 
 class _WriteFeedWidgetState extends State<WriteFeedWidget> {
   final _formKey = GlobalKey<FormState>();
+  final FeedApiService feedApiService = FeedApiService();
 
-  final String _userId = "testUserId";
   String _feedTitle = "";
   String _feedContent = "";
 
-  void _submitFeed() {
-    // TODO API 연동하기
+  Future<void> _submitFeed() async {
     final formState = _formKey.currentState;
 
     if (formState!.validate()) {
       formState.save();
 
-      print("userId = $_userId, title = $_feedTitle, content = $_feedContent");
+      BaseResponse response = await feedApiService.writeFeed(
+        WriteFeedRequest(title: _feedTitle, content: _feedContent),
+        widget.token,
+      );
 
-      Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (context) {
-        return const AllFeedPage();
-      }), (route) => false);
+      if (response.isOk()) {
+        _showSuccessDialog(response.body);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.body),
+          ),
+        );
+      }
     }
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(message),
+          actions: [
+            ElevatedButton(
+              onPressed: () => {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const AllFeedPage();
+                    },
+                  ),
+                  (route) => false,
+                ),
+              },
+              child: const Text("Ok"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

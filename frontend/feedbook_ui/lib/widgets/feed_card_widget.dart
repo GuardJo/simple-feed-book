@@ -1,16 +1,33 @@
+import 'dart:js';
+
+import 'package:feedbook_ui/models/base_response.dart';
 import 'package:feedbook_ui/models/feed_model.dart';
+import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:feedbook_ui/widgets/modify_feed_widget.dart';
 import 'package:flutter/material.dart';
 
 class FeedCard extends StatelessWidget {
   final Feed feed;
+  final String token;
 
-  const FeedCard({super.key, required this.feed});
+  const FeedCard({super.key, required this.feed, required this.token});
 
   void _submmitDeleteRequest(BuildContext context) {
-    // TODO 피드 삭제 요청 API 추가
-    print("Delete Feed, feedId = ${feed.id}");
+    _deleteFeed(context);
+
     Navigator.pop(context);
+  }
+
+  void _deleteFeed(BuildContext context) async {
+    BaseResponse response = await FeedApiService.removeFeed(feed.id, token);
+    Color bgColor = response.isOk() ? Colors.greenAccent : Colors.redAccent;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(response.body),
+        backgroundColor: bgColor,
+      ),
+    );
   }
 
   void _showModifyingDialog(BuildContext context) {
@@ -20,6 +37,7 @@ class FeedCard extends StatelessWidget {
         return Dialog(
           child: ModifyFeedWidget(
             feed: feed,
+            token: token,
           ),
         );
       },

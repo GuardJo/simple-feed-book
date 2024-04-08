@@ -1,52 +1,53 @@
+import 'package:feedbook_ui/models/base_response.dart';
+import 'package:feedbook_ui/models/feed_list_model.dart';
 import 'package:feedbook_ui/models/feed_model.dart';
+import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:feedbook_ui/widgets/feed_card_widget.dart';
 import 'package:flutter/material.dart';
 
-class FeedListWidget extends StatefulWidget {
-  const FeedListWidget({super.key});
+class AllFeedListWidget extends FeedListWidget {
+  const AllFeedListWidget({
+    super.key,
+    required super.token,
+    super.isSelf = false,
+  });
+}
+
+class MyFeedListWidget extends FeedListWidget {
+  const MyFeedListWidget({
+    super.key,
+    required super.token,
+    super.isSelf = true,
+  });
+}
+
+abstract class FeedListWidget extends StatefulWidget {
+  final String token;
+  final bool isSelf;
+  const FeedListWidget({
+    super.key,
+    required this.token,
+    required this.isSelf,
+  });
 
   @override
   State<FeedListWidget> createState() => _FeedListWidgetState();
 }
 
 class _FeedListWidgetState extends State<FeedListWidget> {
-  late final feedList;
+  Future<List<Feed>> _getFeeds() async {
+    BaseResponse response = widget.isSelf
+        ? await FeedApiService.getMyFeeds(widget.token)
+        : await FeedApiService.getFeeds(widget.token);
 
-  void _initFeedList() {
-    // TODO 추후 데이터 주입하도록 변경
+    if (response.isOk()) {
+      FeedListResponse feedListResponse =
+          FeedListResponse.fromJson(response.body);
 
-    feedList = [
-      Feed(
-          id: 1,
-          title: "Title",
-          content: "content",
-          author: "tester",
-          isOwner: true),
-      Feed(
-          id: 2,
-          title: "Title",
-          content: "content",
-          author: "tester",
-          isOwner: true),
-      Feed(
-          id: 3,
-          title: "Title",
-          content: "content",
-          author: "tester",
-          isOwner: true),
-      Feed(
-          id: 4,
-          title: "Title",
-          content: "content",
-          author: "ddd",
-          isOwner: false),
-    ];
-  }
+      return feedListResponse.feeds;
+    }
 
-  @override
-  void initState() {
-    super.initState();
-    _initFeedList();
+    return [];
   }
 
   @override
@@ -54,13 +55,29 @@ class _FeedListWidgetState extends State<FeedListWidget> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Column(
-              children: [for (var feed in feedList) FeedCard(feed: feed)],
-            ),
-          ),
-        );
+            child: FutureBuilder(
+          future: _getFeeds(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.minHeight,
+                ),
+                child: Column(
+                  children: [
+                    for (var feed in snapshot.data!)
+                      FeedCard(
+                        feed: feed,
+                        token: widget.token,
+                      ),
+                  ],
+                ),
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
+        ));
       },
     );
   }
