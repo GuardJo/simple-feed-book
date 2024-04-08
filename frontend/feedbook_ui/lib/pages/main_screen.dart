@@ -33,14 +33,14 @@ class _AllFeedPageState extends State<AllFeedPage> {
     if (!sharedPreferences.containsKey("token")) {
       _onTapGoToLoginPage();
     } else {
-      setState(() {
-        String token = sharedPreferences.getString("token")!;
+      String token = sharedPreferences.getString("token")!;
 
+      setState(() {
         pageType = pageType;
 
         switch (pageType) {
           case PageType.allFeed:
-            pageWidget = const FeedListWidget();
+            pageWidget = FeedListWidget(token: token);
             break;
           case PageType.myFeed:
             pageWidget = const HomeWidget();
@@ -51,15 +51,18 @@ class _AllFeedPageState extends State<AllFeedPage> {
           default:
             pageWidget = const HomeWidget();
         }
+        Navigator.pop(context);
       });
-      Navigator.pop(context);
     }
   }
 
   void _onTapGoToLoginPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return const LoginPage();
-    }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return const LoginPage();
+      }),
+    );
   }
 
   // This widget is the root of your application.
@@ -84,7 +87,6 @@ class _AllFeedPageState extends State<AllFeedPage> {
               ),
               onTap: () {
                 _onTapUpdate(PageType.allFeed);
-                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -92,8 +94,7 @@ class _AllFeedPageState extends State<AllFeedPage> {
                 "My Feeds",
               ),
               onTap: () {
-                _onTapUpdate(PageType.allFeed);
-                Navigator.pop(context);
+                _onTapUpdate(PageType.myFeed);
               },
             ),
             ListTile(
