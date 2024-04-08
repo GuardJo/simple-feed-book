@@ -25,7 +25,8 @@ class FeedApiService {
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> content = jsonDecode(response.body);
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
       return BaseResponse.fromJson(content);
     } else {
       return BaseResponse.internalError();
@@ -41,7 +42,8 @@ class FeedApiService {
     });
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> content = jsonDecode(response.body);
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
       return BaseResponse.fromJson(content);
     } else {
       return BaseResponse.internalError();
@@ -61,7 +63,8 @@ class FeedApiService {
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> content = jsonDecode(response.body);
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
       return BaseResponse.fromJson(content);
     } else {
       return BaseResponse.internalError();
@@ -79,7 +82,8 @@ class FeedApiService {
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> content = jsonDecode(response.body);
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
       return BaseResponse.fromJson(content);
     } else {
       return BaseResponse.internalError();
@@ -97,7 +101,8 @@ class FeedApiService {
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> content = jsonDecode(response.body);
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
       return BaseResponse.fromJson(content);
     } else {
       return BaseResponse.internalError();
