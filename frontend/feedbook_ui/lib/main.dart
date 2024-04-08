@@ -17,6 +17,7 @@ class RootPage extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
+      locale: const Locale('ko', 'KR'),
       home: const AllFeedPage(),
     );
   }
