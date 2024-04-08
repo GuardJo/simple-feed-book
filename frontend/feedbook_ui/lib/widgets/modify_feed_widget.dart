@@ -1,7 +1,6 @@
 import 'package:feedbook_ui/models/base_response.dart';
 import 'package:feedbook_ui/models/feed_model.dart';
 import 'package:feedbook_ui/models/modify_feed_request.dart';
-import 'package:feedbook_ui/pages/main_screen.dart';
 import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +50,7 @@ class _ModifyFeedWidgetState extends State<ModifyFeedWidget> {
     }
   }
 
-  void _modifyFeed() async {
+  Future<void> _modifyFeed() async {
     BaseResponse response = await FeedApiService.modifyFeed(
       token,
       ModifyFeedRequest(
