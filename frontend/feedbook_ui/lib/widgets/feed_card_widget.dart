@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class FeedCard extends StatelessWidget {
   final Feed feed;
+  final String token;
 
-  const FeedCard({super.key, required this.feed});
+  const FeedCard({super.key, required this.feed, required this.token});
 
   void _submmitDeleteRequest(BuildContext context) {
     // TODO 피드 삭제 요청 API 추가
@@ -20,6 +21,7 @@ class FeedCard extends StatelessWidget {
         return Dialog(
           child: ModifyFeedWidget(
             feed: feed,
+            token: token,
           ),
         );
       },

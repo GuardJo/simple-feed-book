@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:feedbook_ui/models/base_response.dart';
+import 'package:feedbook_ui/models/modify_feed_request.dart';
 import 'package:feedbook_ui/models/write_feed_request.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,6 +39,26 @@ class FeedApiService {
       ..._defaultHeaders,
       HttpHeaders.authorizationHeader: "Bearer $token"
     });
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> content = jsonDecode(response.body);
+      return BaseResponse.fromJson(content);
+    } else {
+      return BaseResponse.internalError();
+    }
+  }
+
+  static Future<BaseResponse> modifyFeed(
+      String token, ModifyFeedRequest request) async {
+    var uri = Uri.parse("$_baseUrl/feeds");
+    var response = await http.patch(
+      uri,
+      headers: {
+        ..._defaultHeaders,
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+      body: jsonEncode(request),
+    );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> content = jsonDecode(response.body);

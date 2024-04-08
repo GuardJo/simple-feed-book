@@ -1,18 +1,29 @@
+import 'package:feedbook_ui/models/base_response.dart';
 import 'package:feedbook_ui/models/feed_model.dart';
+import 'package:feedbook_ui/models/modify_feed_request.dart';
+import 'package:feedbook_ui/pages/main_screen.dart';
+import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:flutter/material.dart';
 
 class ModifyFeedWidget extends StatefulWidget {
   final Feed feed;
-  const ModifyFeedWidget({super.key, required this.feed});
+  final String token;
+  const ModifyFeedWidget({
+    super.key,
+    required this.feed,
+    required this.token,
+  });
 
   @override
-  State<ModifyFeedWidget> createState() => _ModifyFeedWidgetState();
+  State<ModifyFeedWidget> createState() => _ModifyFeedWidgetState(token: token);
 }
 
 class _ModifyFeedWidgetState extends State<ModifyFeedWidget> {
   final _formKey = GlobalKey<FormState>();
 
-  final String _userId = "testUserId";
+  final String token;
+
+  _ModifyFeedWidgetState({required this.token});
 
   num _feedId = 0;
 
@@ -29,16 +40,41 @@ class _ModifyFeedWidgetState extends State<ModifyFeedWidget> {
   }
 
   void _submitFeed() {
-    // TODO API 연동하기
     final formState = _formKey.currentState;
 
     if (formState!.validate()) {
       formState.save();
 
-      print(
-          "userId = $_userId, feedId = $_feedId, title = $_feedTitle, content = $_feedContent");
+      _modifyFeed();
 
       Navigator.pop(context);
+    }
+  }
+
+  void _modifyFeed() async {
+    BaseResponse response = await FeedApiService.modifyFeed(
+      token,
+      ModifyFeedRequest(
+        feedId: _feedId,
+        title: _feedTitle,
+        content: _feedContent,
+      ),
+    );
+
+    if (response.isOk()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.greenAccent,
+          content: Text(response.body),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text("Failed : ${response.body}"),
+        ),
+      );
     }
   }
 

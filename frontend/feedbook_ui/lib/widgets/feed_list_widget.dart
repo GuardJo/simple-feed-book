@@ -22,17 +22,16 @@ class _FeedListWidgetState extends State<FeedListWidget> {
   _FeedListWidgetState({required this.token});
 
   Future<List<Feed>> _getFeeds() async {
-    List<Feed> feeds = [];
     BaseResponse response = await FeedApiService.getFeeds(token);
 
     if (response.isOk()) {
       FeedListResponse feedListResponse =
           FeedListResponse.fromJson(response.body);
 
-      feeds = feedListResponse.feeds;
+      return feedListResponse.feeds;
     }
 
-    return feeds;
+    return [];
   }
 
   @override
@@ -50,7 +49,11 @@ class _FeedListWidgetState extends State<FeedListWidget> {
                 ),
                 child: Column(
                   children: [
-                    for (var feed in snapshot.data!) FeedCard(feed: feed),
+                    for (var feed in snapshot.data!)
+                      FeedCard(
+                        feed: feed,
+                        token: token,
+                      ),
                   ],
                 ),
               );
