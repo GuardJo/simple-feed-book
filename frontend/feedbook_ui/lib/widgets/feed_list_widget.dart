@@ -6,7 +6,7 @@ import 'package:feedbook_ui/widgets/feed_card_widget.dart';
 import 'package:flutter/material.dart';
 
 class AllFeedListWidget extends FeedListWidget {
-  AllFeedListWidget({
+  const AllFeedListWidget({
     super.key,
     required super.token,
     super.isSelf = false,
@@ -14,7 +14,7 @@ class AllFeedListWidget extends FeedListWidget {
 }
 
 class MyFeedListWidget extends FeedListWidget {
-  MyFeedListWidget({
+  const MyFeedListWidget({
     super.key,
     required super.token,
     super.isSelf = true,
@@ -22,9 +22,9 @@ class MyFeedListWidget extends FeedListWidget {
 }
 
 abstract class FeedListWidget extends StatefulWidget {
-  String token;
-  bool isSelf;
-  FeedListWidget({
+  final String token;
+  final bool isSelf;
+  const FeedListWidget({
     super.key,
     required this.token,
     required this.isSelf,

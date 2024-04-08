@@ -14,15 +14,11 @@ class ModifyFeedWidget extends StatefulWidget {
   });
 
   @override
-  State<ModifyFeedWidget> createState() => _ModifyFeedWidgetState(token: token);
+  State<ModifyFeedWidget> createState() => _ModifyFeedWidgetState();
 }
 
 class _ModifyFeedWidgetState extends State<ModifyFeedWidget> {
   final _formKey = GlobalKey<FormState>();
-
-  final String token;
-
-  _ModifyFeedWidgetState({required this.token});
 
   num _feedId = 0;
 
@@ -52,7 +48,7 @@ class _ModifyFeedWidgetState extends State<ModifyFeedWidget> {
 
   Future<void> _modifyFeed() async {
     BaseResponse response = await FeedApiService.modifyFeed(
-      token,
+      widget.token,
       ModifyFeedRequest(
         feedId: _feedId,
         title: _feedTitle,

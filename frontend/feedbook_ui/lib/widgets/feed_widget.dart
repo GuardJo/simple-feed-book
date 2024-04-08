@@ -5,25 +5,22 @@ import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:flutter/material.dart';
 
 class WriteFeedWidget extends StatefulWidget {
-  String token;
-  WriteFeedWidget({
+  final String token;
+  const WriteFeedWidget({
     super.key,
     required this.token,
   });
 
   @override
-  State<WriteFeedWidget> createState() => _WriteFeedWidgetState(token: token);
+  State<WriteFeedWidget> createState() => _WriteFeedWidgetState();
 }
 
 class _WriteFeedWidgetState extends State<WriteFeedWidget> {
   final _formKey = GlobalKey<FormState>();
   final FeedApiService feedApiService = FeedApiService();
 
-  String token;
   String _feedTitle = "";
   String _feedContent = "";
-
-  _WriteFeedWidgetState({required this.token});
 
   Future<void> _submitFeed() async {
     final formState = _formKey.currentState;
@@ -31,11 +28,9 @@ class _WriteFeedWidgetState extends State<WriteFeedWidget> {
     if (formState!.validate()) {
       formState.save();
 
-      print("token = $token, title = $_feedTitle, content = $_feedContent");
-
       BaseResponse response = await feedApiService.writeFeed(
         WriteFeedRequest(title: _feedTitle, content: _feedContent),
-        token,
+        widget.token,
       );
 
       if (response.isOk()) {
