@@ -5,24 +5,40 @@ import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:feedbook_ui/widgets/feed_card_widget.dart';
 import 'package:flutter/material.dart';
 
-class FeedListWidget extends StatefulWidget {
+class AllFeedListWidget extends FeedListWidget {
+  AllFeedListWidget({
+    super.key,
+    required super.token,
+    super.isSelf = false,
+  });
+}
+
+class MyFeedListWidget extends FeedListWidget {
+  MyFeedListWidget({
+    super.key,
+    required super.token,
+    super.isSelf = true,
+  });
+}
+
+abstract class FeedListWidget extends StatefulWidget {
   String token;
+  bool isSelf;
   FeedListWidget({
     super.key,
     required this.token,
+    required this.isSelf,
   });
 
   @override
-  State<FeedListWidget> createState() => _FeedListWidgetState(token: token);
+  State<FeedListWidget> createState() => _FeedListWidgetState();
 }
 
 class _FeedListWidgetState extends State<FeedListWidget> {
-  final String token;
-
-  _FeedListWidgetState({required this.token});
-
   Future<List<Feed>> _getFeeds() async {
-    BaseResponse response = await FeedApiService.getFeeds(token);
+    BaseResponse response = widget.isSelf
+        ? await FeedApiService.getMyFeeds(widget.token)
+        : await FeedApiService.getFeeds(widget.token);
 
     if (response.isOk()) {
       FeedListResponse feedListResponse =
@@ -52,7 +68,7 @@ class _FeedListWidgetState extends State<FeedListWidget> {
                     for (var feed in snapshot.data!)
                       FeedCard(
                         feed: feed,
-                        token: token,
+                        token: widget.token,
                       ),
                   ],
                 ),

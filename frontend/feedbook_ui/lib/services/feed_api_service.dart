@@ -85,4 +85,22 @@ class FeedApiService {
       return BaseResponse.internalError();
     }
   }
+
+  static Future<BaseResponse> getMyFeeds(String token) async {
+    var uri = Uri.parse("$_baseUrl/feeds/me");
+    var response = await http.get(
+      uri,
+      headers: {
+        ..._defaultHeaders,
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> content = jsonDecode(response.body);
+      return BaseResponse.fromJson(content);
+    } else {
+      return BaseResponse.internalError();
+    }
+  }
 }

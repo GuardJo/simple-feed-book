@@ -40,10 +40,10 @@ class _AllFeedPageState extends State<AllFeedPage> {
 
         switch (pageType) {
           case PageType.allFeed:
-            pageWidget = FeedListWidget(token: token);
+            pageWidget = AllFeedListWidget(token: token);
             break;
           case PageType.myFeed:
-            pageWidget = const HomeWidget();
+            pageWidget = MyFeedListWidget(token: token);
             break;
           case PageType.writeFeed:
             pageWidget = WriteFeedWidget(token: token);
