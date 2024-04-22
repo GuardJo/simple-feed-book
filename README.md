@@ -229,6 +229,7 @@ string title "피드 제목"
 string content "피드 내용"
 datetime createAt "생성일자"
 datetime modifiedAt "수정일자"
+int favorites "좋아요 개수"
 long accountId fk "Account 식별키"
 }
 Account_Favorite_Feed {
