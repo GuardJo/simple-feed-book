@@ -78,6 +78,7 @@ class _FeedCardState extends State<FeedCard> {
     // TODO 추후 API 연동
     setState(() {
       widget.feed.isFavorite = !widget.feed.isFavorite;
+      widget.feed.totalFavorites += widget.feed.isFavorite ? 1 : -1;
     });
   }
 
@@ -149,12 +150,19 @@ class _FeedCardState extends State<FeedCard> {
             const SizedBox(
               height: 40,
             ),
-            IconButton(
-              onPressed: _updateFavorite,
-              icon: Icon(
-                widget.feed.isFavorite ? Icons.favorite : Icons.favorite_border,
-              ),
-            ),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: _updateFavorite,
+                  icon: Icon(
+                    widget.feed.isFavorite
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                  ),
+                ),
+                Text("+ ${widget.feed.totalFavorites}"),
+              ],
+            )
           ],
         ),
       ),
