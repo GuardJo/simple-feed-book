@@ -26,4 +26,14 @@ create table feed
     title       varchar(255) not null
 );
 
+create table account_favorite_feed
+(
+    account_id integer
+        constraint account_favorite_feed_account_id_fk
+            references account,
+    feed_id    integer
+        constraint account_favorite_feed_feed_id_fk
+            references feed
+);
+
 
