@@ -1,17 +1,20 @@
-import 'dart:js';
-
 import 'package:feedbook_ui/models/base_response.dart';
 import 'package:feedbook_ui/models/feed_model.dart';
 import 'package:feedbook_ui/services/feed_api_service.dart';
 import 'package:feedbook_ui/widgets/modify_feed_widget.dart';
 import 'package:flutter/material.dart';
 
-class FeedCard extends StatelessWidget {
+class FeedCard extends StatefulWidget {
   final Feed feed;
   final String token;
 
   const FeedCard({super.key, required this.feed, required this.token});
 
+  @override
+  State<FeedCard> createState() => _FeedCardState();
+}
+
+class _FeedCardState extends State<FeedCard> {
   void _submmitDeleteRequest(BuildContext context) {
     _deleteFeed(context);
 
@@ -19,7 +22,8 @@ class FeedCard extends StatelessWidget {
   }
 
   void _deleteFeed(BuildContext context) async {
-    BaseResponse response = await FeedApiService.removeFeed(feed.id, token);
+    BaseResponse response =
+        await FeedApiService.removeFeed(widget.feed.id, widget.token);
     Color bgColor = response.isOk() ? Colors.greenAccent : Colors.redAccent;
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -36,8 +40,8 @@ class FeedCard extends StatelessWidget {
       builder: (cotext) {
         return Dialog(
           child: ModifyFeedWidget(
-            feed: feed,
-            token: token,
+            feed: widget.feed,
+            token: widget.token,
           ),
         );
       },
@@ -70,6 +74,13 @@ class FeedCard extends StatelessWidget {
         });
   }
 
+  void _updateFavorite() {
+    // TODO 추후 API 연동
+    setState(() {
+      widget.feed.isFavorite = !widget.feed.isFavorite;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -90,13 +101,13 @@ class FeedCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  feed.title,
+                  widget.feed.title,
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                if (feed.isOwner)
+                if (widget.feed.isOwner)
                   Row(
                     children: [
                       IconButton(
@@ -121,7 +132,7 @@ class FeedCard extends StatelessWidget {
               height: 10,
             ),
             Text(
-              feed.author,
+              widget.feed.author,
               style: const TextStyle(
                 fontSize: 16,
               ),
@@ -130,9 +141,18 @@ class FeedCard extends StatelessWidget {
               height: 20,
             ),
             Text(
-              feed.content,
+              widget.feed.content,
               style: const TextStyle(
                 fontSize: 22,
+              ),
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            IconButton(
+              onPressed: _updateFavorite,
+              icon: Icon(
+                widget.feed.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
             ),
           ],
