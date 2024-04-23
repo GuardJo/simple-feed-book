@@ -7,7 +7,6 @@ import com.guardjo.feedbook.controller.response.BaseResponse;
 import com.guardjo.feedbook.controller.response.FeedDto;
 import com.guardjo.feedbook.controller.response.FeedPageDto;
 import com.guardjo.feedbook.model.domain.Account;
-import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +52,9 @@ public class FeedController {
                 Sort.Order.desc("createdAt")
         ));
 
-        Page<Feed> feeds = feedService.getAllFeeds(pageable);
+        Page<FeedDto> feeds = feedService.getAllFeeds(pageable, account);
 
-        FeedPageDto feedPageDto = initFeedPageDto(feeds, account);
+        FeedPageDto feedPageDto = initFeedPageDto(feeds);
 
         return BaseResponse.<FeedPageDto>builder()
                 .status(HttpStatus.OK.name())
@@ -69,9 +68,9 @@ public class FeedController {
 
         Account account = principal.getAccount();
 
-        Page<Feed> feeds = feedService.getMyFeeds(pageable, account);
+        Page<FeedDto> feeds = feedService.getMyFeeds(pageable, account);
 
-        FeedPageDto feedPageDto = initFeedPageDto(feeds, account);
+        FeedPageDto feedPageDto = initFeedPageDto(feeds);
 
         return BaseResponse.<FeedPageDto>builder()
                 .status(HttpStatus.OK.name())
@@ -103,10 +102,8 @@ public class FeedController {
         return BaseResponse.defaultSuccesses();
     }
 
-    private FeedPageDto initFeedPageDto(Page<Feed> feeds, Account account) {
-        List<FeedDto> feedDtos = feeds.stream()
-                .map(feed -> FeedDto.from(feed, account))
-                .toList();
+    private FeedPageDto initFeedPageDto(Page<FeedDto> feeds) {
+        List<FeedDto> feedDtos = feeds.getContent();
 
         return new FeedPageDto(feedDtos, feeds.getTotalPages());
     }

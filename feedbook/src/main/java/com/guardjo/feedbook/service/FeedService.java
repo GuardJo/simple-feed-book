@@ -1,5 +1,6 @@
 package com.guardjo.feedbook.service;
 
+import com.guardjo.feedbook.controller.response.FeedDto;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.InvalidRequestException;
 import com.guardjo.feedbook.model.domain.Account;
@@ -38,11 +39,12 @@ public class FeedService {
      * 저장되어 있는 전체 피드 목록을 페이징해서 반환한다.
      *
      * @param pageable 조회할 페이지 설정
-     * @return 페이징된 Feed 목록
+     * @param account  조회 요청 계정
+     * @return 페이징된 FeedDto 목록
      */
-    public Page<Feed> getAllFeeds(Pageable pageable) {
+    public Page<FeedDto> getAllFeeds(Pageable pageable, Account account) {
 
-        Page<Feed> feeds = feedRepository.findAll(pageable);
+        Page<FeedDto> feeds = feedRepository.findAllFeedDto(pageable, account);
 
         log.info("Found, Feed List, totalPage = {}, totalSize = {}", feeds.getTotalPages(), feeds.getTotalElements());
 
@@ -56,8 +58,8 @@ public class FeedService {
      * @param account  작성자 계정
      * @return 페이징된 Feed 목록
      */
-    public Page<Feed> getMyFeeds(Pageable pageable, Account account) {
-        Page<Feed> feeds = feedRepository.findAllByAccount(pageable, account);
+    public Page<FeedDto> getMyFeeds(Pageable pageable, Account account) {
+        Page<FeedDto> feeds = feedRepository.findAllFeedDto(pageable, account);
 
         log.info("Found, My Feed List. totalPage = {}, totalSize = {}", feeds.getTotalPages(), feeds.getTotalElements());
 
