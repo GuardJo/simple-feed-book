@@ -108,4 +108,24 @@ class FeedApiService {
       return BaseResponse.internalError();
     }
   }
+
+  static Future<BaseResponse> updateFavorite(num feedId, String token) async {
+    var uri = Uri.parse("$_baseUrl/feeds/favorites/$feedId");
+
+    var response = await http.put(
+      uri,
+      headers: {
+        ..._defaultHeaders,
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      return BaseResponse.fromJson(content);
+    } else {
+      return BaseResponse.internalError();
+    }
+  }
 }

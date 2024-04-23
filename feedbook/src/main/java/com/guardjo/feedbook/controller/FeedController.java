@@ -97,6 +97,15 @@ public class FeedController {
         return BaseResponse.defaultSuccesses();
     }
 
+    @PutMapping(UrlContext.FAVORITE_FEEDS_URL + "/{feedId}")
+    public BaseResponse<String> updateFavoriteFeed(@PathVariable long feedId, @AuthenticationPrincipal AccountPrincipal principal) {
+        log.info("PUT : {}/{}, username = {}", UrlContext.FAVORITE_FEEDS_URL, feedId, principal.getUsername());
+
+        feedService.updateFeedFavorite(feedId, principal.getAccount());
+
+        return BaseResponse.defaultSuccesses();
+    }
+
     private FeedPageDto initFeedPageDto(Page<FeedDto> feeds) {
         List<FeedDto> feedDtos = feeds.getContent();
 

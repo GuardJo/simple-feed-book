@@ -186,4 +186,19 @@ class FeedServiceTest {
 
         then(feedRepository).should().findById(eq(feedId));
     }
+
+    @DisplayName("특정 피드의 좋아요 갱신 테스트")
+    @Test
+    void test_updateFeedFavorite() {
+        long feedId = 1L;
+        Account requester = TestDataGenerator.account(1L, "test123");
+
+        Feed feed = TestDataGenerator.feed(feedId, "title", "content", requester);
+
+        given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(feed));
+
+        feedService.updateFeedFavorite(feedId, requester);
+
+        then(feedRepository).should().findById(eq(feedId));
+    }
 }
