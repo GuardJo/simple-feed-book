@@ -11,9 +11,7 @@ import com.guardjo.feedbook.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,9 +46,6 @@ public class FeedController {
         log.info("GET : {}, username = {}", UrlContext.FEEDS_URL, principal.getUsername());
 
         Account account = principal.getAccount();
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(
-                Sort.Order.desc("createdAt")
-        ));
 
         Page<FeedDto> feeds = feedService.getAllFeeds(pageable, account);
 

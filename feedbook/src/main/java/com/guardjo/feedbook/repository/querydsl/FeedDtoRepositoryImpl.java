@@ -25,6 +25,7 @@ public class FeedDtoRepositoryImpl extends QuerydslRepositorySupport implements 
         BooleanExpression isFavorite = qFeed.favoriteAccounts.contains(account);
 
         JPQLQuery<FeedDto> query = from(qFeed)
+                .orderBy(qFeed.createdAt.desc())
                 .select(Projections.constructor(FeedDto.class,
                         qFeed.id,
                         qFeed.title,
