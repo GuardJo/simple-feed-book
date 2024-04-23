@@ -12,6 +12,7 @@ import com.guardjo.feedbook.controller.response.FeedDto;
 import com.guardjo.feedbook.controller.response.FeedPageDto;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.InvalidRequestException;
+import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.service.FeedService;
 import com.guardjo.feedbook.util.JwtProvider;
@@ -108,9 +109,9 @@ class FeedControllerTest {
 
         Feed feed = TestDataGenerator.feed(1L, "test", "content", TEST_PRINCIPAL.getAccount());
         FeedDto expected = FeedDto.from(feed, TEST_PRINCIPAL.getAccount());
-        Page<Feed> feeds = new PageImpl<>(List.of(feed));
+        Page<FeedDto> feeds = new PageImpl<>(List.of(expected));
 
-        given(feedService.getAllFeeds(any(Pageable.class))).willReturn(feeds);
+        given(feedService.getAllFeeds(any(Pageable.class), any(Account.class))).willReturn(feeds);
 
         String response = mockMvc.perform(get(UrlContext.FEEDS_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +129,7 @@ class FeedControllerTest {
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.OK.name());
         assertThat(actual.getBody().feeds()).isEqualTo(List.of(expected));
 
-        then(feedService).should().getAllFeeds(any(Pageable.class));
+        then(feedService).should().getAllFeeds(any(Pageable.class), any(Account.class));
     }
 
     @DisplayName("GET : " + UrlContext.MY_FEEDS_URL + " : 정상")
@@ -138,7 +139,7 @@ class FeedControllerTest {
 
         Feed feed = TestDataGenerator.feed(1L, "test", "content", TEST_PRINCIPAL.getAccount());
         FeedDto expected = FeedDto.from(feed, TEST_PRINCIPAL.getAccount());
-        Page<Feed> feeds = new PageImpl<>(List.of(feed));
+        Page<FeedDto> feeds = new PageImpl<>(List.of(expected));
 
         given(feedService.getMyFeeds(any(Pageable.class), eq(TEST_PRINCIPAL.getAccount()))).willReturn(feeds);
 

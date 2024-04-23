@@ -8,7 +8,9 @@ public record FeedDto(
         String title,
         String content,
         String author,
-        boolean isOwner
+        boolean isOwner,
+        boolean isFavorite,
+        int totalFavorites
 ) {
     public static FeedDto from(Feed feed, Account principal) {
         Account owner = feed.getAccount();
@@ -18,7 +20,9 @@ public record FeedDto(
                 feed.getTitle(),
                 feed.getContent(),
                 owner.getNickname(),
-                owner.equals(principal)
+                owner.equals(principal),
+                feed.getFavoriteAccounts().contains(principal),
+                feed.getFavorites()
         );
     }
 }

@@ -215,24 +215,31 @@ Web ->> User : 알림 이력 페이지 출력
 title : simple-feed-book ERD
 ---
 erDiagram
-Account {
-    long id pk "식별키"
-    string username uk "사용자 아이디"
-    string password "암호화 된 비밀번호"
-    string nickname "사용자 이름"
-    datetime createAt "생성일자"
-    datetime modifedAt "수정일자"
+  Account {
+long id pk "식별키"
+string username uk "사용자 아이디"
+string password "암호화 된 비밀번호"
+string nickname "사용자 이름"
+datetime createAt "생성일자"
+datetime modifedAt "수정일자"
 }
 Feed {
-    long id fk "식별키"
-    string title "피드 제목"
-    string content "피드 내용"
-    datetime createAt "생성일자"
-    datetime modifiedAt "수정일자"
-    long accountId fk "Account 식별키"
+long id fk "식별키"
+string title "피드 제목"
+string content "피드 내용"
+datetime createAt "생성일자"
+datetime modifiedAt "수정일자"
+int favorites "좋아요 개수"
+long accountId fk "Account 식별키"
+}
+Account_Favorite_Feed {
+long accountId fk "Account 식별키"
+long feedId fk "Feed 식별키"
 }
 
 Account ||--o{ Feed : accountId
+Account o{--|| Account_Favorite_Feed : accountId
+Feed o{--|| Account_Favorite_Feed : feedId
 ```
 
 # server 모듈 의존성

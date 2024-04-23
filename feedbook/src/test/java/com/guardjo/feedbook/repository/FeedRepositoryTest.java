@@ -1,6 +1,7 @@
 package com.guardjo.feedbook.repository;
 
 import com.guardjo.feedbook.config.JpaConfig;
+import com.guardjo.feedbook.controller.response.FeedDto;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.util.TestDataGenerator;
@@ -49,6 +50,9 @@ class FeedRepositoryTest {
                 tester = account2;
             }
             Feed feed = TestDataGenerator.feed("test_" + i, tester);
+
+            feed.setFavorites(1);
+            feed.getFavoriteAccounts().add(account2);
             testFeeds.add(feedRepository.save(feed));
         }
     }
@@ -80,6 +84,18 @@ class FeedRepositoryTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getTotalElements()).isEqualTo(totalSize);
+    }
+
+    @DisplayName("좋아요가 포함된 FeedDto Proection 조회 테스트")
+    @Test
+    void test_findAllFeedDto() {
+        Account account = testFeeds.get(0).getAccount();
+        Pageable pageable = Pageable.ofSize(10);
+        Page<FeedDto> actual = feedRepository.findAllFeedDto(pageable, account);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.get().toList()).isNotNull();
+        assertThat(actual.getTotalElements()).isEqualTo(TEST_DATA_SIZE);
     }
 
     private static Stream<Arguments> findAllByAccountTestArgs() {
