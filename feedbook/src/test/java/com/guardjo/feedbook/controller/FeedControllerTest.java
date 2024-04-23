@@ -321,6 +321,32 @@ class FeedControllerTest {
         then(feedService).should().deleteFeed(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
     }
 
+    @DisplayName("PUT : " + UrlContext.FAVORITE_FEEDS_URL + " : 정상")
+    @Test
+    void test_updateFavoriteFeed() throws Exception {
+        long feedId = 1L;
+        String token = "Bearer test-token";
+
+        willDoNothing().given(feedService).updateFeedFavorite(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+
+        String response = mockMvc.perform(put(UrlContext.FAVORITE_FEEDS_URL + "/" + feedId)
+                        .header(HttpHeaders.AUTHORIZATION, token)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        BaseResponse<String> actual = objectMapper.readValue(response, BaseResponse.class);
+
+
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(BaseResponse.defaultSuccesses());
+
+        then(feedService).should().updateFeedFavorite(eq(feedId), eq(TEST_PRINCIPAL.getAccount()));
+    }
+
     private static Stream<Arguments> handleExceptionData() {
         return Stream.of(
                 Arguments.of(InvalidRequestException.class, HttpStatus.FORBIDDEN.name()),

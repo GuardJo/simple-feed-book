@@ -36,4 +36,24 @@ public class Feed extends BaseEntity {
     )
     @Builder.Default
     private List<Account> favoriteAccounts = new ArrayList<>();
+
+    /**
+     * 해당 계정의 favorite을 추가한다.
+     *
+     * @param account
+     */
+    public void addFavorite(Account account) {
+        this.favoriteAccounts.add(account);
+        this.favorites++;
+    }
+
+    /**
+     * 해당 계정의 favorite을 제거한다.
+     *
+     * @param account
+     */
+    public void subtractFavorite(Account account) {
+        this.favoriteAccounts.remove(account);
+        this.favorites--;
+    }
 }

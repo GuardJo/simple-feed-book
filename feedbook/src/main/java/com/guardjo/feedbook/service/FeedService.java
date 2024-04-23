@@ -109,6 +109,24 @@ public class FeedService {
         log.info("Deleted Feed, feedId = {}", id);
     }
 
+    /**
+     * 해당하는 Feed의 favorite을 갱신한다.0
+     *
+     * @param id      Feed 식별키
+     * @param account 요청 계정
+     */
+    public void updateFeedFavorite(long id, Account account) {
+        Feed feed = feedRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Feed.class, id));
+
+        if (feed.getFavoriteAccounts().contains(account)) {
+            feed.subtractFavorite(account);
+            log.info("Update subtract favorite account, feedId = {}", feed.getId());
+        } else {
+            feed.addFavorite(account);
+            log.info("Update add favorite account, feedId = {}", feed.getId());
+        }
+    }
+
     private Feed createNewFeed(String title, String content, Account account) {
         return Feed.builder()
                 .title(title)
