@@ -35,17 +35,19 @@ class _FeedCardState extends State<FeedCard> {
   }
 
   void _showModifyingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (cotext) {
-        return Dialog(
-          child: ModifyFeedWidget(
-            feed: widget.feed,
-            token: widget.token,
-          ),
-        );
-      },
-    );
+    setState(() {
+      showDialog(
+        context: context,
+        builder: (cotext) {
+          return Dialog(
+            child: ModifyFeedWidget(
+              feed: widget.feed,
+              token: widget.token,
+            ),
+          );
+        },
+      );
+    });
   }
 
   void _showDeleteDialog(BuildContext context) {
@@ -74,8 +76,9 @@ class _FeedCardState extends State<FeedCard> {
         });
   }
 
-  void _updateFavorite() {
-    // TODO 추후 API 연동
+  void _updateFavorite() async {
+    await FeedApiService.updateFavorite(widget.feed.id, widget.token);
+
     setState(() {
       widget.feed.isFavorite = !widget.feed.isFavorite;
       widget.feed.totalFavorites += widget.feed.isFavorite ? 1 : -1;
