@@ -1,6 +1,7 @@
 import 'package:feedbook_ui/models/base_response.dart';
 import 'package:feedbook_ui/models/feed_model.dart';
 import 'package:feedbook_ui/services/feed_api_service.dart';
+import 'package:feedbook_ui/widgets/comments_list_widget.dart';
 import 'package:feedbook_ui/widgets/modify_feed_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +46,17 @@ class _FeedCardState extends State<FeedCard> {
               token: widget.token,
             ),
           );
+        },
+      );
+    });
+  }
+
+  void _showCommentsListDialog(BuildContext context) {
+    setState(() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return const CommentListWidget();
         },
       );
     });
@@ -154,16 +166,27 @@ class _FeedCardState extends State<FeedCard> {
               height: 40,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: _updateFavorite,
-                  icon: Icon(
-                    widget.feed.isFavorite
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                  ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _updateFavorite,
+                      icon: Icon(
+                        widget.feed.isFavorite
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                      ),
+                    ),
+                    Text("+ ${widget.feed.totalFavorites}"),
+                  ],
                 ),
-                Text("+ ${widget.feed.totalFavorites}"),
+                TextButton(
+                  onPressed: () {
+                    _showCommentsListDialog(context);
+                  },
+                  child: const Text("Comments..."),
+                ),
               ],
             )
           ],
