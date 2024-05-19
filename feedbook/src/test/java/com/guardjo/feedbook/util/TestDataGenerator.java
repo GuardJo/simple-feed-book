@@ -51,6 +51,15 @@ public class TestDataGenerator {
 			.build();
 	}
 
+	public static FeedComment feedComment(long id, String content, Feed feed, Account account) {
+		return FeedComment.builder()
+			.id(id)
+			.content(content)
+			.feed(feed)
+			.account(account)
+			.build();
+	}
+
 	public static AccountPrincipal accountPrincipal(Long id, String username) {
 		Account account = account(id, username);
 
