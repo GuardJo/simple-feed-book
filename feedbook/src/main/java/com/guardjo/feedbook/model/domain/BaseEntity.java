@@ -10,17 +10,22 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SuperBuilder(toBuilder = true)
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 	@CreatedDate
-	private Date createdAt;
+	@Builder.Default
+	private Date createdAt = new Date();
 	@LastModifiedDate
-	private Date modifiedAt;
+	@Builder.Default
+	private Date modifiedAt = new Date();
 }

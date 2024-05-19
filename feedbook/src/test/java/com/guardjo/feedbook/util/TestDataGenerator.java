@@ -3,6 +3,7 @@ package com.guardjo.feedbook.util;
 import com.guardjo.feedbook.config.auth.AccountPrincipal;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
+import com.guardjo.feedbook.model.domain.FeedComment;
 
 public class TestDataGenerator {
 	private TestDataGenerator() {
@@ -38,6 +39,23 @@ public class TestDataGenerator {
 			.id(id)
 			.title(title)
 			.content(content)
+			.account(account)
+			.build();
+	}
+
+	public static FeedComment feedComment(String content, Feed feed, Account account) {
+		return FeedComment.builder()
+			.content(content)
+			.feed(feed)
+			.account(account)
+			.build();
+	}
+
+	public static FeedComment feedComment(long id, String content, Feed feed, Account account) {
+		return FeedComment.builder()
+			.id(id)
+			.content(content)
+			.feed(feed)
 			.account(account)
 			.build();
 	}
