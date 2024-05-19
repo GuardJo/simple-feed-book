@@ -16,3 +16,10 @@ values (2, 'ccc', 'tttt');
 
 insert into account_favorite_feed(account_id, feed_id)
 values (1, 1);
+
+insert into feed_comment(content, feed_id, account_id)
+values ('Comment 1', 1, 1);
+insert into feed_comment(content, feed_id, account_id)
+values ('Comment 2', 1, 2);
+insert into feed_comment(content, feed_id, account_id)
+values ('Commment 3', 2, 2);

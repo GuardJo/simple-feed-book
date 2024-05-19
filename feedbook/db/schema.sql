@@ -1,5 +1,6 @@
 create sequence account_id_seq;
 create sequence feed_id_seq;
+create sequence feed_comment_id_seq;
 
 create table account
 (
@@ -37,4 +38,11 @@ create table account_favorite_feed
             references feed
 );
 
-
+create table feed_comment (
+                              id bigint not null default nextval('feed_comment_id_seq') primary key,
+                              created_at timestamp(6) default current_timestamp,
+                              modified_at timestamp(6) default current_timestamp,
+                              content varchar(500) not null,
+                              feed_id bigint not null constraint feed_comment_feed_id_fk references feed,
+                              account_id bigint not null constraint feed_comment_account_id_fk references account
+);
