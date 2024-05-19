@@ -72,12 +72,12 @@ class FeedCommentControllerTest {
 	@Test
 	void test_saveFeedComment() throws Exception {
 		long feedId = 1L;
-		FeedCommentCreateRequest request = new FeedCommentCreateRequest(feedId, "test");
+		FeedCommentCreateRequest request = new FeedCommentCreateRequest("test");
 		String requestContent = objectMapper.writeValueAsString(request);
 
 		willDoNothing().given(feedCommentService).createNewComment(eq(request.content()), eq(TEST_PRINCIPAL.getAccount()), eq(feedId));
 
-		String response = mockMvc.perform(post(UrlContext.FEED_COMMENTS_URL)
+		String response = mockMvc.perform(post(UrlContext.FEED_COMMENTS_URL.replace("{feedId}", String.valueOf(feedId)))
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, TEST_TOKEN)
 				.content(requestContent)
@@ -100,12 +100,12 @@ class FeedCommentControllerTest {
 	@Test
 	void test_saveFeedComment_BadRequest() throws Exception {
 		long feedId = 1L;
-		FeedCommentCreateRequest request = new FeedCommentCreateRequest(feedId, "");
+		FeedCommentCreateRequest request = new FeedCommentCreateRequest("");
 		String requestContent = objectMapper.writeValueAsString(request);
 
 		willDoNothing().given(feedCommentService).createNewComment(eq(request.content()), eq(TEST_PRINCIPAL.getAccount()), eq(feedId));
 
-		String response = mockMvc.perform(post(UrlContext.FEED_COMMENTS_URL)
+		String response = mockMvc.perform(post(UrlContext.FEED_COMMENTS_URL.replace("{feedId}", String.valueOf(feedId)))
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, TEST_TOKEN)
 				.content(requestContent)

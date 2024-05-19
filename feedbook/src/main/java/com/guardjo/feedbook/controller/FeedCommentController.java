@@ -2,6 +2,7 @@ package com.guardjo.feedbook.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,14 +24,14 @@ public class FeedCommentController {
 	private final FeedCommentService feedCommentService;
 
 	@PostMapping(UrlContext.FEED_COMMENTS_URL)
-	public BaseResponse<String> saveFeedComment(@RequestBody FeedCommentCreateRequest request,
+	public BaseResponse<String> saveFeedComment(@RequestBody FeedCommentCreateRequest request, @PathVariable("feedId") long feedId,
 		@AuthenticationPrincipal AccountPrincipal principal) {
 		Account account = principal.getAccount();
 
-		log.info("POST : {}, account = {}, feedId = {}", UrlContext.FEED_COMMENTS_URL, account, request.feedId());
+		log.info("POST : {}, account = {}, feedId = {}", UrlContext.FEED_COMMENTS_URL, account, feedId);
 
 		if (request.isValid()) {
-			feedCommentService.createNewComment(request.content(), account, request.feedId());
+			feedCommentService.createNewComment(request.content(), account, feedId);
 		} else {
 			throw new IllegalArgumentException("Content is Empty");
 		}
