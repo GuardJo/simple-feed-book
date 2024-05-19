@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.guardjo.feedbook.config.JpaConfig;
@@ -79,7 +82,10 @@ class FeedCommentRepositoryTest {
 			.filter(feedComment -> (feedComment.getFeed().equals(feed)))
 			.toList();
 
-		List<FeedComment> actual = feedCommentRepository.findByFeedId(feed.getId());
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<FeedComment> feedCommentPage = feedCommentRepository.findAllByFeedId(feed.getId(), pageable);
+		List<FeedComment> actual = feedCommentPage.getContent();
 
 		assertThat(actual.size()).isEqualTo(expected.size());
 		assertThat(actual).isEqualTo(expected);
