@@ -68,10 +68,13 @@ class CommentListWidget extends StatelessWidget {
                           }
                         },
                       )),
-                  const SizedBox(
+                  SizedBox(
                     width: 500,
                     height: 100,
-                    child: WriteCommentWidget(),
+                    child: WriteCommentWidget(
+                      feedId: feedId,
+                      token: token,
+                    ),
                   ),
                 ],
               ),
