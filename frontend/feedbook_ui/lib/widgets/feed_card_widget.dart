@@ -56,7 +56,10 @@ class _FeedCardState extends State<FeedCard> {
       showDialog(
         context: context,
         builder: (context) {
-          return const CommentListWidget();
+          return CommentListWidget(
+            feedId: widget.feed.id,
+            token: widget.token,
+          );
         },
       );
     });

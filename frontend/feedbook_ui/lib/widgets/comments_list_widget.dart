@@ -1,45 +1,30 @@
+import 'package:feedbook_ui/models/base_response.dart';
 import 'package:feedbook_ui/models/comment_model.dart';
+import 'package:feedbook_ui/models/feed_comment_list_model.dart';
+import 'package:feedbook_ui/services/feed_comment_api_service.dart';
 import 'package:feedbook_ui/widgets/comment_card_widget.dart';
 import 'package:feedbook_ui/widgets/write_comment_widget.dart';
 import 'package:flutter/material.dart';
 
 class CommentListWidget extends StatelessWidget {
-  const CommentListWidget({super.key});
+  final num feedId;
+  final String token;
+  const CommentListWidget({
+    super.key,
+    required this.feedId,
+    required this.token,
+  });
 
-  List<Comment> getComments() {
-    // TODO 추후 API 연동하기
-    return [
-      Comment(
-          id: 1,
-          author: "Tester1",
-          createTime: "2024-05-27 18:28",
-          content: "Hello~"),
-      Comment(
-          id: 2,
-          author: "Tester2",
-          createTime: "2024-05-27 16:33",
-          content: "Hahahaha"),
-      Comment(
-          id: 3,
-          author: "Tester2",
-          createTime: "2024-05-26 16:00",
-          content: "Test"),
-      Comment(
-          id: 1,
-          author: "Tester1",
-          createTime: "2024-05-27 18:28",
-          content: "Hello~"),
-      Comment(
-          id: 2,
-          author: "Tester2",
-          createTime: "2024-05-27 16:33",
-          content: "Hahahaha"),
-      Comment(
-          id: 3,
-          author: "Tester2",
-          createTime: "2024-05-26 16:00",
-          content: "Test"),
-    ];
+  Future<List<Comment>> getComments() async {
+    BaseResponse response =
+        await FeedCommentService.getFeedComments(feedId, token);
+
+    if (response.isOk()) {
+      FeedCommentList feedCommentList = FeedCommentList.fromJson(response.body);
+      return feedCommentList.comments;
+    }
+
+    return [];
   }
 
   @override
@@ -65,14 +50,24 @@ class CommentListWidget extends StatelessWidget {
                     height: 30,
                   ),
                   SizedBox(
-                    height: 400,
-                    child: ListView(
-                      children: [
-                        for (var comment in getComments())
-                          CommentCard(comment: comment)
-                      ],
-                    ),
-                  ),
+                      height: 400,
+                      child: FutureBuilder(
+                        future: getComments(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView(children: [
+                              for (var comment in snapshot.data!)
+                                CommentCard(
+                                  comment: comment,
+                                )
+                            ]);
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
+                      )),
                   const SizedBox(
                     width: 500,
                     height: 100,
