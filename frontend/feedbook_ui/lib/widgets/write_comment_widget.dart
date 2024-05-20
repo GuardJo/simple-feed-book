@@ -43,7 +43,6 @@ class _WriteCommentWidgetState extends State<WriteCommentWidget> {
   }
 
   Future<void> _saveComment() async {
-    // TODO 추후 API 연동
     if (commentContent.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
