@@ -23,3 +23,10 @@ insert into feed_comment(content, feed_id, account_id)
 values ('Comment 2', 1, 2);
 insert into feed_comment(content, feed_id, account_id)
 values ('Commment 3', 2, 2);
+
+insert into feed_alarm(alarm_type, args, feed_id)
+values ('FAVORITE', '{"accountId": 1}', 1);
+insert into feed_alarm(alarm_type, args, feed_id)
+values ('COMMENT', '{"accountId": 1}', 1);
+insert into feed_alarm(alarm_type, args, feed_id)
+values ('COMMENT', '{"accountId": 2}', 1);
