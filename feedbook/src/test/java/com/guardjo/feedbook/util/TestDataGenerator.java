@@ -3,7 +3,10 @@ package com.guardjo.feedbook.util;
 import com.guardjo.feedbook.config.auth.AccountPrincipal;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
+import com.guardjo.feedbook.model.domain.FeedAlarm;
 import com.guardjo.feedbook.model.domain.FeedComment;
+import com.guardjo.feedbook.model.domain.types.AlarmArgs;
+import com.guardjo.feedbook.model.domain.types.AlarmType;
 
 public class TestDataGenerator {
 	private TestDataGenerator() {
@@ -57,6 +60,14 @@ public class TestDataGenerator {
 			.content(content)
 			.feed(feed)
 			.account(account)
+			.build();
+	}
+
+	public static FeedAlarm feedAlarm(AlarmType alarmType, AlarmArgs alarmArgs, Feed feed) {
+		return FeedAlarm.builder()
+			.alarmType(alarmType)
+			.args(alarmArgs)
+			.feed(feed)
 			.build();
 	}
 
