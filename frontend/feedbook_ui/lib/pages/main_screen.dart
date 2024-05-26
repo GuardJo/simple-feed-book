@@ -1,4 +1,5 @@
 import 'package:feedbook_ui/pages/login_screen.dart';
+import 'package:feedbook_ui/widgets/alarm_list_widget.dart';
 import 'package:feedbook_ui/widgets/feed_list_widget.dart';
 import 'package:feedbook_ui/widgets/feed_widget.dart';
 import 'package:feedbook_ui/widgets/home_widget.dart';
@@ -47,6 +48,9 @@ class _AllFeedPageState extends State<AllFeedPage> {
             break;
           case PageType.writeFeed:
             pageWidget = WriteFeedWidget(token: token);
+            break;
+          case PageType.alarms:
+            pageWidget = const AlarmListWidget();
             break;
           default:
             pageWidget = const HomeWidget();
@@ -105,6 +109,12 @@ class _AllFeedPageState extends State<AllFeedPage> {
                 _onTapUpdate(PageType.writeFeed);
               },
             ),
+            ListTile(
+              title: const Text("Alarms"),
+              onTap: () {
+                _onTapUpdate(PageType.alarms);
+              },
+            ),
             ListBody(
               children: [
                 TextButton(
@@ -125,4 +135,5 @@ enum PageType {
   allFeed,
   myFeed,
   writeFeed,
+  alarms,
 }
