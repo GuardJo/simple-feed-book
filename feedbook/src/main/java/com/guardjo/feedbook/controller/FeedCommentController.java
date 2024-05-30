@@ -19,6 +19,9 @@ import com.guardjo.feedbook.controller.response.BaseResponse;
 import com.guardjo.feedbook.controller.response.FeedCommentPageDto;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.FeedComment;
+import com.guardjo.feedbook.model.domain.types.AlarmArgs;
+import com.guardjo.feedbook.model.domain.types.AlarmType;
+import com.guardjo.feedbook.service.FeedAlarmService;
 import com.guardjo.feedbook.service.FeedCommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FeedCommentController {
 	private final FeedCommentService feedCommentService;
+	private final FeedAlarmService feedAlarmService;
 
 	@PostMapping(UrlContext.FEED_COMMENTS_URL)
 	public BaseResponse<String> saveFeedComment(@RequestBody FeedCommentCreateRequest request, @PathVariable("feedId") long feedId,
@@ -40,6 +44,7 @@ public class FeedCommentController {
 
 		if (request.isValid()) {
 			feedCommentService.createNewComment(request.content(), account, feedId);
+			feedAlarmService.saveNewAlarm(AlarmType.COMMENT, new AlarmArgs(account.getId()), feedId);
 		} else {
 			throw new IllegalArgumentException("Content is Empty");
 		}

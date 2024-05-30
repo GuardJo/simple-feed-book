@@ -40,6 +40,9 @@ import com.guardjo.feedbook.controller.response.FeedCommentDto;
 import com.guardjo.feedbook.controller.response.FeedCommentPageDto;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.model.domain.FeedComment;
+import com.guardjo.feedbook.model.domain.types.AlarmArgs;
+import com.guardjo.feedbook.model.domain.types.AlarmType;
+import com.guardjo.feedbook.service.FeedAlarmService;
 import com.guardjo.feedbook.service.FeedCommentService;
 import com.guardjo.feedbook.util.JwtProvider;
 import com.guardjo.feedbook.util.TestDataGenerator;
@@ -58,6 +61,8 @@ class FeedCommentControllerTest {
 	private JwtAuthManager jwtAuthManager;
 	@MockBean
 	private FeedCommentService feedCommentService;
+	@MockBean
+	private FeedAlarmService feedAlarmService;
 
 	private final static String TEST_TOKEN = "Bearer Test";
 	private final static AccountPrincipal TEST_PRINCIPAL = TestDataGenerator.accountPrincipal(1L, "Tester");
@@ -86,6 +91,7 @@ class FeedCommentControllerTest {
 		String requestContent = objectMapper.writeValueAsString(request);
 
 		willDoNothing().given(feedCommentService).createNewComment(eq(request.content()), eq(TEST_PRINCIPAL.getAccount()), eq(feedId));
+		willDoNothing().given(feedAlarmService).saveNewAlarm(eq(AlarmType.COMMENT), any(AlarmArgs.class), eq(feedId));
 
 		String response = mockMvc.perform(post(UrlContext.FEED_COMMENTS_URL.replace("{feedId}", String.valueOf(feedId)))
 				.contentType(MediaType.APPLICATION_JSON)
@@ -105,6 +111,7 @@ class FeedCommentControllerTest {
 		assertThat(actual).isEqualTo(BaseResponse.defaultSuccesses());
 
 		then(feedCommentService).should().createNewComment(eq(request.content()), eq(TEST_PRINCIPAL.getAccount()), eq(feedId));
+		then(feedAlarmService).should().saveNewAlarm(eq(AlarmType.COMMENT), any(AlarmArgs.class), eq(feedId));
 	}
 
 	@DisplayName("POST : " + UrlContext.FEED_COMMENTS_URL + " : 입력값이 잘못된 경우")
