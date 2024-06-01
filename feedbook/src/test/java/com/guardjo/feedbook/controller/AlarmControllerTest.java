@@ -2,6 +2,7 @@ package com.guardjo.feedbook.controller;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -103,5 +104,29 @@ class AlarmControllerTest {
 		assertThat(actual.getBody()).isEqualTo(expected);
 
 		then(feedAlarmService).should().findAllFeedAlarmByAccount(eq(TEST_PRINCIPAL.getAccount()), any(Pageable.class));
+	}
+
+	@DisplayName("DELETE : " + UrlContext.ALARMS_URL)
+	@Test
+	void test_deleteAllAlarms() throws Exception {
+		willDoNothing().given(feedAlarmService).deleteAllFeedAlarmByAccount(eq(TEST_PRINCIPAL.getAccount()));
+
+		String response = mockMvc.perform(delete(UrlContext.ALARMS_URL)
+				.header(HttpHeaders.AUTHORIZATION, TEST_TOKEN)
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.with(csrf()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(StandardCharsets.UTF_8);
+
+		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(BaseResponse.class, String.class);
+		BaseResponse<String> actual = objectMapper.readValue(response, javaType);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual).isEqualTo(BaseResponse.defaultSuccesses());
+
+		then(feedAlarmService).should().deleteAllFeedAlarmByAccount(eq(TEST_PRINCIPAL.getAccount()));
 	}
 }

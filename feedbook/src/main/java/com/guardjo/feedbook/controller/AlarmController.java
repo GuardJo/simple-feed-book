@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +36,15 @@ public class AlarmController {
 			.status(HttpStatus.OK.name())
 			.body(feedAlarmPageDto)
 			.build();
+	}
+
+	@DeleteMapping(UrlContext.ALARMS_URL)
+	public BaseResponse<String> deleteAllAlarms(@AuthenticationPrincipal AccountPrincipal principal) {
+		Account account = principal.getAccount();
+		log.info("DELETE : " + UrlContext.ALARMS_URL + "accountId = {}", account.getId());
+
+		feedAlarmService.deleteAllFeedAlarmByAccount(account);
+
+		return BaseResponse.defaultSuccesses();
 	}
 }

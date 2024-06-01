@@ -88,6 +88,17 @@ class FeedAlarmServiceTest {
 
 	}
 
+	@DisplayName("계정별 피드 알림 전체 삭제")
+	@Test
+	void test_deleteAllFeedAlarmByAccount() {
+		willDoNothing().given(feedAlarmRepository).deleteAllByFeed_Account_Id(eq(TESTER.getId()));
+
+		assertThatCode(() -> feedAlarmService.deleteAllFeedAlarmByAccount(TESTER))
+			.doesNotThrowAnyException();
+
+		then(feedAlarmRepository).should().deleteAllByFeed_Account_Id(eq(TESTER.getId()));
+	}
+
 	private static Stream<Arguments> saveTestParams() {
 		return Stream.of(
 			Arguments.of(AlarmType.COMMENT, new AlarmArgs(TESTER.getId())),

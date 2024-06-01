@@ -56,11 +56,26 @@ public class FeedAlarmService {
 	 * @param pageable 페이지네이션 옵션
 	 * @return 전체 알림 개수, 현재 페이지 수, 현재 페이지의 피드 알림 목록
 	 */
+	@Transactional(readOnly = true)
 	public FeedAlarmPageDto findAllFeedAlarmByAccount(Account account, Pageable pageable) {
 		log.debug("Find FeedAlarm List, accountId = {}", account.getId());
 
 		Page<FeedAlarm> feedAlarms = feedAlarmRepository.findAllByFeed_Account_Id(account.getId(), pageable);
 
+		log.info("Found FeedAlarm List, accountId = {}", account.getId());
+
 		return FeedAlarmPageDto.from(feedAlarms, account);
+	}
+
+	/**
+	 * 주어진 계정에 해당하는 피드 알림 전체 삭제
+	 * @param account
+	 */
+	public void deleteAllFeedAlarmByAccount(Account account) {
+		log.debug("Deleting FeedAlarm List, accountId = {}", account.getId());
+
+		feedAlarmRepository.deleteAllByFeed_Account_Id(account.getId());
+
+		log.info("Deleted FeedAlarm List, accountId = {}", account.getId());
 	}
 }
