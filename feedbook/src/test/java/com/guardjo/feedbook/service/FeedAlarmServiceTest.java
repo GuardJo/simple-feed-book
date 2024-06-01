@@ -3,9 +3,11 @@ package com.guardjo.feedbook.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,7 +16,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import com.guardjo.feedbook.controller.response.FeedAlarmPageDto;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.model.domain.FeedAlarm;
@@ -58,6 +65,27 @@ class FeedAlarmServiceTest {
 
 		then(feedRepository).should().getReferenceById(eq(feedId));
 		then(feedAlarmRepository).should().save(any(FeedAlarm.class));
+	}
+
+	@DisplayName("계정별 피드 알림 조회")
+	@Test
+	void test_findAllFeedAlarmByAccount() {
+		Account account = TestDataGenerator.account(99L, "Tester222");
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<FeedAlarm> expected = new PageImpl<>(List.of(TestDataGenerator.feedAlarm(AlarmType.COMMENT, new AlarmArgs(account.getId()), TEST_FEED)));
+
+		given(feedAlarmRepository.findAllByFeed_Account_Id(eq(account.getId()), eq(pageable))).willReturn(expected);
+
+		FeedAlarmPageDto actual = feedAlarmService.findAllFeedAlarmByAccount(account, pageable);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.pageNumber()).isEqualTo(pageable.getPageNumber());
+		assertThat(actual.totalSize()).isEqualTo(expected.getTotalElements());
+		assertThat(actual.feedAlarms().size()).isEqualTo(expected.getContent().size());
+		assertThat(actual.feedAlarms().get(0).alarmText().contains(expected.getContent().get(0).getFeed().getTitle())).isTrue();
+
+		then(feedAlarmRepository).should().findAllByFeed_Account_Id(eq(account.getId()), eq(pageable));
+
 	}
 
 	private static Stream<Arguments> saveTestParams() {

@@ -1,9 +1,13 @@
 package com.guardjo.feedbook.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.guardjo.feedbook.controller.response.FeedAlarmPageDto;
+import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.Feed;
 import com.guardjo.feedbook.model.domain.FeedAlarm;
 import com.guardjo.feedbook.model.domain.types.AlarmArgs;
@@ -43,5 +47,20 @@ public class FeedAlarmService {
 		feedAlarmRepository.save(newAlarm);
 
 		log.info("Created New FeedAlarm, type = {}, feedId = {}", alarmType, feedId);
+	}
+
+	/**
+	 * 주어진 계정 식별키에 해당하는 피드 알림 목록을 반환한다.
+	 *
+	 * @param account 피드 알림을 조회할 계정
+	 * @param pageable 페이지네이션 옵션
+	 * @return 전체 알림 개수, 현재 페이지 수, 현재 페이지의 피드 알림 목록
+	 */
+	public FeedAlarmPageDto findAllFeedAlarmByAccount(Account account, Pageable pageable) {
+		log.debug("Find FeedAlarm List, accountId = {}", account.getId());
+
+		Page<FeedAlarm> feedAlarms = feedAlarmRepository.findAllByFeed_Account_Id(account.getId(), pageable);
+
+		return FeedAlarmPageDto.from(feedAlarms, account);
 	}
 }
