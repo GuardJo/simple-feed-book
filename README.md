@@ -215,35 +215,42 @@ Web ->> User : 알림 이력 페이지 출력
 title : simple-feed-book ERD
 ---
 erDiagram
-Account {
-    long id pk "식별키"
-    string username uk "사용자 아이디"
-    string password "암호화 된 비밀번호"
-    string nickname "사용자 이름"
-    datetime createAt "생성일자"
-    datetime modifedAt "수정일자"
+  Account {
+long id pk "식별키"
+string username uk "사용자 아이디"
+string password "암호화 된 비밀번호"
+string nickname "사용자 이름"
+datetime createAt "생성일자"
+datetime modifedAt "수정일자"
 }
 Feed {
-    long id pk "식별키"
-    string title "피드 제목"
-    string content "피드 내용"
-    datetime createAt "생성일자"
-    datetime modifiedAt "수정일자"
-    int favorites "좋아요 개수"
-    long accountId fk "Account 식별키"
+long id pk "식별키"
+string title "피드 제목"
+string content "피드 내용"
+datetime createAt "생성일자"
+datetime modifiedAt "수정일자"
+int favorites "좋아요 개수"
+long accountId fk "Account 식별키"
 }
 Account_Favorite_Feed {
-    long accountId fk "Account 식별키"
-    long feedId fk "Feed 식별키"
+long accountId fk "Account 식별키"
+long feedId fk "Feed 식별키"
 }
 
 FEED_COMMENT {
-    long id pk "식별키"
-    string content "댓글 내용"
-    datetime createAt "생성일자"
-    datetime modifiedAt "수정일자"
-    long feed_id fk "Feed 식별키"
-    long account_id fk "Account 식별키"
+long id pk "식별키"
+string content "댓글 내용"
+datetime createAt "생성일자"
+datetime modifiedAt "수정일자"
+long feed_id fk "Feed 식별키"
+long account_id fk "Account 식별키"
+}
+
+Feed_Alarm {
+long id pk "식별키"
+string alarmType "알림 종류 (FAVORITE / COMMENT)"
+jsonb args "알림 종류에 따른 필요 arguments (댓글 작성자, 좋아요 개수 등)"
+long feedId fk "Feed 식별키"
 }
 
 Account ||--o{ Feed : accountId
@@ -252,6 +259,8 @@ Feed o{--|| Account_Favorite_Feed : feedId
 
 FEED_COMMENT o{--|| Feed: feedId
 FEED_COMMENT o{--|| Account: accountId
+
+Feed_Alarm o{--|| Feed : feedId
 ```
 
 # server 모듈 의존성
