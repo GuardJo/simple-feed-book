@@ -5,21 +5,62 @@ import 'package:feedbook_ui/services/alarm_api_service.dart';
 import 'package:feedbook_ui/widgets/alarm_card_widget.dart';
 import 'package:flutter/material.dart';
 
-class AlarmListWidget extends StatelessWidget {
+class AlarmListWidget extends StatefulWidget {
   final String token;
   const AlarmListWidget({super.key, required this.token});
 
-  void _clearAlarams() {
-    print("알림 제거");
+  @override
+  State<AlarmListWidget> createState() => _AlarmListWidgetState();
+}
+
+class _AlarmListWidgetState extends State<AlarmListWidget> {
+  Future<void> _clearAlarams(BuildContext context) async {
+    BaseResponse response = await AlarmApiService.clearAlarms(widget.token);
+
+    setState(() {
+      Color bgColor = response.isOk() ? Colors.greenAccent : Colors.redAccent;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.body),
+          backgroundColor: bgColor,
+        ),
+      );
+    });
+  }
+
+  void _showClearAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("알림 초기화"),
+          content: const Text("알림 내역을 초기화 하시겠습니까?"),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                _clearAlarams(context);
+                Navigator.pop(context);
+              },
+              child: const Text("Yes"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("No"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<List<Alarm>> _getAlarms() async {
-    BaseResponse response = await AlarmApiService.getFeedAlarms(token);
+    BaseResponse response = await AlarmApiService.getFeedAlarms(widget.token);
 
     if (response.isOk()) {
       AlarmList alarmList = AlarmList.fromJson(response.body);
-
-      print(alarmList);
 
       return alarmList.feedAlarms;
     } else {
@@ -48,7 +89,7 @@ class AlarmListWidget extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: _clearAlarams,
+                    onPressed: () => _showClearAlert(context),
                     child: const Text("알림 초기화"),
                   ),
                 ],
@@ -61,17 +102,23 @@ class AlarmListWidget extends StatelessWidget {
                   future: _getAlarms(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return Column(
-                        children: [
-                          for (var alarm in snapshot.data!)
-                            AlamrCard(
-                              alarm: alarm,
+                      if (snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Text("No Data"),
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            for (var alarm in snapshot.data!)
+                              AlamrCard(
+                                alarm: alarm,
+                              ),
+                            const SizedBox(
+                              height: 10,
                             ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        ],
-                      );
+                          ],
+                        );
+                      }
                     } else {
                       return const Center(
                         child: CircularProgressIndicator(),

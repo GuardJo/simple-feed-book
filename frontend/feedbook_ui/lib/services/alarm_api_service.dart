@@ -30,4 +30,21 @@ class AlarmApiService {
       return BaseResponse.internalError();
     }
   }
+
+  static Future<BaseResponse> clearAlarms(String token) async {
+    var uri = Uri.parse("$baseUrl/accounts/alarms");
+
+    var response = await http.delete(uri, headers: {
+      ...defaultHeaders,
+      HttpHeaders.authorizationHeader: token,
+    });
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> content =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      return BaseResponse.fromJson(content);
+    } else {
+      return BaseResponse.internalError();
+    }
+  }
 }
