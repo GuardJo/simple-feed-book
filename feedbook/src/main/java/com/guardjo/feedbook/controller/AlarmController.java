@@ -41,7 +41,7 @@ public class AlarmController {
 	@DeleteMapping(UrlContext.ALARMS_URL)
 	public BaseResponse<String> deleteAllAlarms(@AuthenticationPrincipal AccountPrincipal principal) {
 		Account account = principal.getAccount();
-		log.info("DELETE : " + UrlContext.ALARMS_URL + "accountId = {}", account.getId());
+		log.info("DELETE : " + UrlContext.ALARMS_URL + " accountId = {}", account.getId());
 
 		feedAlarmService.deleteAllFeedAlarmByAccount(account);
 
