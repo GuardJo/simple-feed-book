@@ -1,21 +1,71 @@
+import 'package:feedbook_ui/models/alarm_list_model.dart';
 import 'package:feedbook_ui/models/alarm_model.dart';
+import 'package:feedbook_ui/models/base_response.dart';
+import 'package:feedbook_ui/services/alarm_api_service.dart';
 import 'package:feedbook_ui/widgets/alarm_card_widget.dart';
 import 'package:flutter/material.dart';
 
-class AlarmListWidget extends StatelessWidget {
-  const AlarmListWidget({super.key});
+class AlarmListWidget extends StatefulWidget {
+  final String token;
+  const AlarmListWidget({super.key, required this.token});
 
-  void _clearAlarams() {
-    print("알림 제거");
+  @override
+  State<AlarmListWidget> createState() => _AlarmListWidgetState();
+}
+
+class _AlarmListWidgetState extends State<AlarmListWidget> {
+  Future<void> _clearAlarams(BuildContext context) async {
+    BaseResponse response = await AlarmApiService.clearAlarms(widget.token);
+
+    setState(() {
+      Color bgColor = response.isOk() ? Colors.greenAccent : Colors.redAccent;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.body),
+          backgroundColor: bgColor,
+        ),
+      );
+    });
   }
 
-  List<Alarm> getAlarms() {
-    // TODO API 연동 필요
-    return [
-      Alarm(alarmText: "test1님이 xxx 게시글에 신규 댓글을 등록하였습니다.", alarmTime: "1초"),
-      Alarm(alarmText: "test2 님 외 222명이 xxx 게시글을 좋아합니다.", alarmTime: "1일"),
-      Alarm(alarmText: "test3 님이 yyyy 게시글에 신규 댓글을 등록하였습니다.", alarmTime: "7일"),
-    ];
+  void _showClearAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("알림 초기화"),
+          content: const Text("알림 내역을 초기화 하시겠습니까?"),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                _clearAlarams(context);
+                Navigator.pop(context);
+              },
+              child: const Text("Yes"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("No"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<List<Alarm>> _getAlarms() async {
+    BaseResponse response = await AlarmApiService.getFeedAlarms(widget.token);
+
+    if (response.isOk()) {
+      AlarmList alarmList = AlarmList.fromJson(response.body);
+
+      return alarmList.feedAlarms;
+    } else {
+      return [];
+    }
   }
 
   @override
@@ -39,7 +89,7 @@ class AlarmListWidget extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: _clearAlarams,
+                    onPressed: () => _showClearAlert(context),
                     child: const Text("알림 초기화"),
                   ),
                 ],
@@ -48,16 +98,33 @@ class AlarmListWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   vertical: 30,
                 ),
-                child: Column(
-                  children: [
-                    for (var alarm in getAlarms())
-                      AlamrCard(
-                        alarm: alarm,
-                      ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],
+                child: FutureBuilder(
+                  future: _getAlarms(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Text("No Data"),
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            for (var alarm in snapshot.data!)
+                              AlamrCard(
+                                alarm: alarm,
+                              ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        );
+                      }
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
                 ),
               ),
             ],
