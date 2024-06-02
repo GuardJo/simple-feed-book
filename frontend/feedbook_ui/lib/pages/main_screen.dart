@@ -50,7 +50,7 @@ class _AllFeedPageState extends State<AllFeedPage> {
             pageWidget = WriteFeedWidget(token: token);
             break;
           case PageType.alarms:
-            pageWidget = const AlarmListWidget();
+            pageWidget = AlarmListWidget(token: token);
             break;
           default:
             pageWidget = const HomeWidget();

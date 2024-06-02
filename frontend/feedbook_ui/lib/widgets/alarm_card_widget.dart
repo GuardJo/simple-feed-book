@@ -32,18 +32,21 @@ class AlamrCard extends StatelessWidget {
         ),
         alignment: Alignment.centerLeft,
         child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
+          padding: const EdgeInsets.all(20),
+          child: Text.rich(
+            TextSpan(
               children: [
-                Text(alarm.alarmText),
-                Text(
-                  " ${alarm.alarmTime}",
+                TextSpan(text: alarm.alarmText),
+                TextSpan(
+                  text: " ${alarm.alarmTime}",
                   style: const TextStyle(
                     color: Colors.black38,
                   ),
-                )
+                ),
               ],
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
