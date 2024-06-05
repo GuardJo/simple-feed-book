@@ -78,9 +78,9 @@ class FeedAlarmRepositoryTest {
 
 	@AfterEach
 	void tearDown() {
-		accountRepository.deleteAll();
-		feedRepository.deleteAll();
 		feedAlarmRepository.deleteAll();
+		feedRepository.deleteAll();
+		accountRepository.deleteAll();
 		TEST_ACCOUNTS.clear();
 		TEST_FEEDS.clear();
 		TEST_DATA.clear();
