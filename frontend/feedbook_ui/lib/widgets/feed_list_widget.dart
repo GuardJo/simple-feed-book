@@ -59,6 +59,16 @@ class _FeedListWidgetState extends State<FeedListWidget> {
           future: _getFeeds(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("No Data."),
+                    ],
+                  ),
+                );
+              }
               return ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: constraints.minHeight,
