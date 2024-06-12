@@ -59,6 +59,10 @@ public class Feed extends BaseEntity {
 	@Builder.Default
 	private List<FeedAlarm> feedAlarms = new ArrayList<>();
 
+	@OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE)
+	@Builder.Default
+	private List<FeedComment> feedComments = new ArrayList<>();
+
 	/**
 	 * 해당 계정의 favorite을 추가한다.
 	 *
