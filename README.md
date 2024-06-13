@@ -104,24 +104,28 @@ Web ->> User : 토큰 저장
 
 ```mermaid
 sequenceDiagram
-actor User
-participant Web
-participant Server
-participant DB
+  actor User
+  participant Web
+  participant Server
+  participant Redis
+  participant DB
 
-User ->> Web : 인증/인가 필요 요청
-Web ->> Server : 헤더 내 JWT 토큰 조회
-Server ->> Server : 토큰 복호화
-Server -->> Web : 복호화 실패 시 에러 전달
-Web -->> User : 인증/인가 오류 전달
-Server ->> DB : 복호화된 정보 기반으로 회원 조회
-DB -->> Server : 조회 실패 시
-Server -->> Web : 조회 실패 오류 전달
-Web -->> User : 인증/인가 오류 전달
-DB ->> Server : 조회된 회원 정보 반환
-Server ->> Server : 인증/인가 성공
-Server ->> Web : 응답 데이터 반환
-Web ->> User : 응답 데이터 가공 및 전달
+  User ->> Web : 인증/인가 필요 요청
+  Web ->> Server : 헤더 내 JWT 토큰 조회
+  Server ->> Server : 토큰 복호화
+  Server -->> Web : 복호화 실패 시 에러 전달
+  Web -->> User : 인증/인가 오류 전달
+  Server ->> Redis : 복호화된 정보 기반으로 회원 조회
+  Redis -->> DB : 캐싱된 회원 정보가 없을 경우
+  DB -->> Server : 조회 실패 시
+  Server -->> Web : 조회 실패 오류 전달
+  Web -->> User : 인증/인가 오류 전달
+  DB -->> Server : DB에 직접 저장된 회원 정보 반환
+  DB ->> Redis : 회원 정보 캐싱
+  Redis ->> Server : 조회된 회원 정보 반환
+  Server ->> Server : 인증/인가 성공
+  Server ->> Web : 응답 데이터 반환
+  Web ->> User : 응답 데이터 가공 및 전달
 ```
 
 ## 좋아요 요청 처리
