@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class AccountCache {
 	@Id
-	private Long id;
+	private String id;
 	private Account account;
 }

@@ -41,6 +41,7 @@ class AccountCacheRepositoryTest {
 		for (int i = 0; i < TEST_DATA_SIZE; i++) {
 			Account account = TestDataGenerator.account(i + 1, "Tester" + i);
 			AccountCache accountCache = AccountCache.builder()
+				.id(account.getUsername())
 				.account(account)
 				.build();
 
@@ -59,6 +60,7 @@ class AccountCacheRepositoryTest {
 	void test_save() {
 		Account account = TestDataGenerator.account(99L, "test222");
 		AccountCache accountCache = AccountCache.builder()
+			.id(account.getUsername())
 			.account(account)
 			.build();
 
@@ -68,14 +70,14 @@ class AccountCacheRepositoryTest {
 		assertThat(accountCacheRepository.count()).isEqualTo(TEST_DATA_SIZE + 1);
 	}
 
-	@DisplayName("식별키를 통한 단일 조회")
+	@DisplayName("식별키(username)를 통한 단일 조회")
 	@Test
 	void test_findById() {
 		AccountCache expected = TEST_DATA_LIST.get(0);
 
-		long id = expected.getId();
+		String username = expected.getAccount().getUsername();
 
-		AccountCache actual = accountCacheRepository.findById(id).orElseThrow();
+		AccountCache actual = accountCacheRepository.findById(username).orElseThrow();
 
 		assertThat(actual).isNotNull();
 		assertThat(actual.getAccount()).isNotNull();
