@@ -32,7 +32,6 @@ public class JwtAuthManager implements AuthenticationManager {
 
 	private Account searchAccount(String username) {
 		try {
-			// TODO  매 요청 마다 조회 해오니, 추후 Redis등으로 캐성하여 조회하도록 개선하는 것이 좋을 듯함
 			return accountService.findAccount(username);
 		} catch (Exception e) {
 			throw new CustomAuthenticationException(e.getMessage());
