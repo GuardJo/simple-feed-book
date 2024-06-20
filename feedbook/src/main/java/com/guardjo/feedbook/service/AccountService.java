@@ -1,5 +1,7 @@
 package com.guardjo.feedbook.service;
 
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,7 +10,9 @@ import com.guardjo.feedbook.exception.DuplicateUsernameException;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
+import com.guardjo.feedbook.model.domain.AccountCache;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.repository.cache.AccountCacheRepository;
 import com.guardjo.feedbook.util.JwtProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class AccountService {
 	private final AccountRepository accountRepository;
+	private final AccountCacheRepository accountCacheRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtProvider jwtProvider;
 
@@ -77,11 +82,33 @@ public class AccountService {
 	public Account findAccount(String username) {
 		log.info("Find Account, username = {}", username);
 
-		return accountRepository.findByUsername(username)
+		Optional<AccountCache> accountCache = accountCacheRepository.findById(username);
+
+		if (accountCache.isPresent()) {
+			log.debug("Fount Account in Cache, username = {}", username);
+			return accountCache.get().getAccount();
+		}
+
+		Account account = accountRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(Account.class, "username", username));
+
+		saveNewAccountCache(account);
+
+		return account;
 	}
 
 	private String createJwtToken(Account account) {
 		return jwtProvider.createToken(account.getUsername());
+	}
+
+	private void saveNewAccountCache(Account account) {
+		log.debug("Save AccountCache, username = {}", account.getUsername());
+
+		AccountCache accountCache = AccountCache.builder()
+			.id(account.getUsername())
+			.account(account)
+			.build();
+
+		accountCacheRepository.save(accountCache);
 	}
 }

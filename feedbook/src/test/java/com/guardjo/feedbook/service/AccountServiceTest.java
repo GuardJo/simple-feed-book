@@ -18,7 +18,9 @@ import com.guardjo.feedbook.exception.DuplicateUsernameException;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
+import com.guardjo.feedbook.model.domain.AccountCache;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.repository.cache.AccountCacheRepository;
 import com.guardjo.feedbook.util.JwtProvider;
 import com.guardjo.feedbook.util.TestDataGenerator;
 
@@ -28,6 +30,8 @@ class AccountServiceTest {
 	private PasswordEncoder passwordEncoder;
 	@Mock
 	private AccountRepository accountRepository;
+	@Mock
+	private AccountCacheRepository accountCacheRepository;
 	@Mock
 	private JwtProvider jwtProvider;
 
@@ -83,6 +87,7 @@ class AccountServiceTest {
 		String password = account.getPassword();
 		String expected = "test-token";
 
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.empty());
 		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(account));
 		given(passwordEncoder.matches(eq(password), eq(account.getPassword()))).willReturn(true);
 		given(jwtProvider.createToken(eq(account.getUsername()))).willReturn(expected);
@@ -92,6 +97,7 @@ class AccountServiceTest {
 		assertThat(actual).isNotNull();
 		assertThat(actual).isEqualTo(expected);
 
+		then(accountCacheRepository).should().findById(eq(username));
 		then(accountRepository).should().findByUsername(eq(username));
 		then(passwordEncoder).should().matches(eq(password), eq(account.getPassword()));
 		then(jwtProvider).should().createToken(eq(account.getUsername()));
@@ -104,10 +110,12 @@ class AccountServiceTest {
 		String username = expected.getUsername();
 		String password = expected.getPassword();
 
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.empty());
 		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.empty());
 
 		assertThatCode(() -> accountService.login(username, password)).isInstanceOf(EntityNotFoundException.class);
 
+		then(accountCacheRepository).should().findById(eq(username));
 		then(accountRepository).should().findByUsername(eq(username));
 	}
 
@@ -118,12 +126,93 @@ class AccountServiceTest {
 		String username = expected.getUsername();
 		String password = expected.getPassword();
 
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.empty());
 		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(expected));
 		given(passwordEncoder.matches(eq(password), eq(expected.getPassword()))).willReturn(false);
 
 		assertThatCode(() -> accountService.login(username, password)).isInstanceOf(WrongPasswordException.class);
 
+		then(accountCacheRepository).should().findById(eq(username));
 		then(accountRepository).should().findByUsername(eq(username));
 		then(passwordEncoder).should().matches(eq(password), eq(expected.getPassword()));
+	}
+
+	@DisplayName("회원 조회 테스트 : 정상")
+	@Test
+	void test_findAccount() {
+		Account expected = TestDataGenerator.account(1, "test");
+		String username = expected.getUsername();
+
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.empty());
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(expected));
+
+		Account actual = accountService.findAccount(username);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getUsername()).isEqualTo(username);
+
+		then(accountCacheRepository).should().findById(eq(username));
+		then(accountRepository).should().findByUsername(eq(username));
+	}
+
+	@DisplayName("회원 조회 테스트 : 캐싱 조회")
+	@Test
+	void test_findAccount_Cache() {
+		Account expected = TestDataGenerator.account(1, "test");
+		String username = expected.getUsername();
+		AccountCache accountCache = AccountCache.builder()
+			.id(expected.getUsername())
+			.account(expected)
+			.build();
+
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.of(accountCache));
+
+		Account actual = accountService.findAccount(username);
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getUsername()).isEqualTo(username);
+
+		then(accountCacheRepository).should().findById(eq(username));
+	}
+
+	@DisplayName("회원 조회 테스트 : 조회 실패")
+	@Test
+	void test_findAccount_NotFoundEntity() {
+		String username = "wrong";
+
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.empty());
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.empty());
+
+		assertThatCode(() -> accountService.findAccount(username))
+			.isInstanceOf(EntityNotFoundException.class);
+
+		then(accountCacheRepository).should().findById(eq(username));
+		then(accountRepository).should().findByUsername(eq(username));
+	}
+
+	@DisplayName("회원 조회 테스트 : 캐시 조회 실패")
+	@Test
+	void test_findAccount_NotFoundEntity_Cache() {
+		Account expected = TestDataGenerator.account(1L, "tester");
+		String username = expected.getUsername();
+
+		ArgumentCaptor<AccountCache> argumentCaptor = ArgumentCaptor.forClass(AccountCache.class);
+
+		given(accountCacheRepository.findById(eq(username))).willReturn(Optional.empty());
+		given(accountRepository.findByUsername(eq(username))).willReturn(Optional.of(expected));
+		given(accountCacheRepository.save(argumentCaptor.capture())).willReturn(mock(AccountCache.class));
+
+		Account actual = accountService.findAccount(username);
+		AccountCache cache = argumentCaptor.getValue();
+
+		assertThat(actual).isNotNull();
+		assertThat(actual.getUsername()).isEqualTo(username);
+		assertThat(cache).isNotNull();
+		assertThat(cache.getId()).isEqualTo(username);
+		assertThat(cache.getAccount()).isEqualTo(expected);
+
+		then(accountCacheRepository).should().findById(eq(username));
+		then(accountRepository).should().findByUsername(eq(username));
+		then(accountCacheRepository).should().save(any(AccountCache.class));
 	}
 }
