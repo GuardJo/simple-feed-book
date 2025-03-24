@@ -42,9 +42,12 @@ export default function AppBar({children}: AppbarProps) {
                             Alarms
                         </Link>
                         <div className="mt-auto p-4">
-                            <Link href="/login" className="text-blue-500 hover:underline">
-                                Login
-                            </Link>
+                            <Button asChild
+                                    className="w-full bg-gray-100 hover:bg-gray-300 text-black">
+                                <Link href="/login" className="flex justify-center items-center ">
+                                    Login
+                                </Link>
+                            </Button>
                         </div>
                     </nav>
                 </div>
