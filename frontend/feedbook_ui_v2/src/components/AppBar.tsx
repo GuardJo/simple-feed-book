@@ -19,7 +19,9 @@ export default function AppBar({children}: AppbarProps) {
                     <Menu className="h-5 w-5"/>
                     <span className="sr-only">메뉴 열기</span>
                 </Button>
-                <h1 className="text-xl font-medium">Simple Feed Book</h1>
+                <Link href="/">
+                    <h1 className="text-xl font-medium">Simple Feed Book</h1>
+                </Link>
                 {openSidebar && <div className="fixed inset-0 z-20 bg-black/50" onClick={() => setOpenSidebar(false)}/>}
                 <div className={cn(
                     "fixed inset-y-0 left-0 z-30 w-64 transform bg-white transition-transform duration-300 ease-in-out",
