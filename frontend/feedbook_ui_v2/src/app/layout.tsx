@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
+import AppBar from "@/components/AppBar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export default function RootLayout({
         >
         <main className="min-h-screen bg-gray-50">
             <div className="relative flex min-h-screen flex-col">
-                {children}
+                <AppBar>
+                    {children}
+                </AppBar>
             </div>
         </main>
         </body>
