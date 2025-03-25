@@ -11,8 +11,15 @@ const preview: Preview = {
         },
         nextjs: {
             appDirectory: true,
+        },
+        docs: {
+            story: {
+                inline: false,
+                iframeHeight: 400
+            }
         }
     },
+    tags: ["autodocs"]
 };
 
 export default preview;
