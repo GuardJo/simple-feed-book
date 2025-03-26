@@ -1,6 +1,5 @@
 import {Meta, StoryObj} from "@storybook/react";
 import FocusingInput from "@/components/FocusingInput";
-import {fn} from "@storybook/test";
 
 const meta = {
     title: "components/FocusingInput",
@@ -19,7 +18,6 @@ export const Username: Story = {
         id: 'username',
         labelName: 'ID',
         type: "text",
-        onChange: fn(),
     }
 }
 
@@ -28,7 +26,6 @@ export const Nickname: Story = {
         id: 'nickname',
         labelName: 'Name',
         type: "text",
-        onChange: fn(),
     }
 }
 
@@ -37,6 +34,5 @@ export const Password: Story = {
         id: 'password',
         labelName: 'Password',
         type: "password",
-        onChange: fn(),
     }
 }
