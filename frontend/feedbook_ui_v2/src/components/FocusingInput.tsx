@@ -20,13 +20,14 @@ export default function FocusingInput({id, labelName, type, value = ""}: Focusin
             }>
                 {labelName}
             </label>
-            <input id={id} type={type}
+            <input id={id} type={type} name={id}
                    onChange={(e) => setInputValue(e.target.value)}
                    onFocus={() => setFocusedLabel(true)}
                    onBlur={() => setFocusedLabel(false)}
                    value={inputValue}
                    className="w-full border-b border-gray-300 bg-transparent py-2 focus:border-blue-500 focus:outline-none"
                    required/>
+            {(inputValue.trim().length > 0)}
         </div>
     )
 }
