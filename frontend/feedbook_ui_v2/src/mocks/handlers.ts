@@ -8,5 +8,11 @@ export const handlers = [
             status: 'OK',
             body: 'SUCCESSES'
         })
+    }),
+    http.post(`${mockUrl}/api/login`, () => {
+        return HttpResponse.json({
+            status: 'OK',
+            body: 'TestToken'
+        })
     })
 ]

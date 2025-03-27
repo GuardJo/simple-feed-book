@@ -3,17 +3,38 @@
 import FocusingInput from "@/components/FocusingInput";
 import Link from "next/link";
 import {FormEvent} from "react";
+import {login, LoginRequest} from "@/lib/accountApiCaller";
+import {useMutation} from "@tanstack/react-query";
+import {setAccessToken} from "@/lib/utils";
+import {useRouter} from "next/navigation";
 
 /**
  * 로그인 폼 컴포넌트
  */
 export default function LoginForm() {
+    const router = useRouter()
+    const loginMutation = useMutation({
+            mutationKey: ["login"],
+            mutationFn: (req: LoginRequest) => login(req),
+            onSuccess: data => {
+                setAccessToken(data.body)
+                router.push("/")
+            },
+            onError: error => {
+                window.alert(error.message)
+            }
+        }
+    )
+
     const handleLogin = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault()
         const formData: FormData = new FormData(event.target as HTMLFormElement)
+        const loginRequest: LoginRequest = {
+            username: formData.get("username")!.toString(),
+            password: formData.get("password")!.toString()
+        }
 
-        // TODO API 연동
-        console.log(`ID : ${formData.get("username")}, password : ${formData.get("password")}`)
+        loginMutation.mutate(loginRequest)
     }
 
     return (
