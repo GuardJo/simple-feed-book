@@ -12,9 +12,12 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",
+    "@tanstack/react-query": "^5.69.0",
+    "@tanstack/react-query-devtools": "^5.69.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.483.0",
+    "msw": "^2.7.3",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -31,12 +34,14 @@
     "@storybook/react": "8.6.8",
     "@storybook/test": "8.6.8",
     "@tailwindcss/postcss": "^4",
+    "@tanstack/eslint-plugin-query": "^5.68.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
     "eslint-plugin-storybook": "^0.11.6",
+    "msw-storybook-addon": "^2.0.4",
     "storybook": "8.6.8",
     "tailwindcss": "^4",
     "typescript": "^5"
@@ -44,6 +49,11 @@
   "eslintConfig": {
     "extends": [
       "plugin:storybook/recommended"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

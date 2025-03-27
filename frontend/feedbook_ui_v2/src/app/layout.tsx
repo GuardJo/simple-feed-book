@@ -2,6 +2,8 @@ import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import AppBar from "@/components/AppBar";
+import QueryProvider from "@/containers/QueryProvider";
+import MswProvider from "@/containers/MswProvider";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,13 +30,17 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        <main className="min-h-screen bg-gray-50">
-            <div className="relative flex min-h-screen flex-col">
-                <AppBar>
-                    {children}
-                </AppBar>
-            </div>
-        </main>
+        <MswProvider>
+            <QueryProvider>
+                <main className="min-h-screen bg-gray-50">
+                    <div className="relative flex min-h-screen flex-col">
+                        <AppBar>
+                            {children}
+                        </AppBar>
+                    </div>
+                </main>
+            </QueryProvider>
+        </MswProvider>
         </body>
         </html>
     );

@@ -4,15 +4,6 @@ import AppBar from "@/components/AppBar";
 const meta = {
     title: "layouts/AppBar",
     component: AppBar,
-    tags: ["autodocs"],
-    parameters: {
-        docs: {
-            story: {
-                inline: false,
-                iframeHeight: 400
-            }
-        }
-    }
 } satisfies Meta<typeof AppBar>
 
 export default meta
