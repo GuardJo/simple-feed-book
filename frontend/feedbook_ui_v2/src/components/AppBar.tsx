@@ -46,7 +46,8 @@ export default function AppBar({children}: AppbarProps) {
                         <div className="mt-auto p-4">
                             <Button asChild
                                     className="w-full bg-gray-100 hover:bg-gray-300 text-black">
-                                <Link href="/login" className="flex justify-center items-center ">
+                                <Link href="/login" className="flex justify-center items-center"
+                                      onClick={() => setOpenSidebar(false)}>
                                     Login
                                 </Link>
                             </Button>
