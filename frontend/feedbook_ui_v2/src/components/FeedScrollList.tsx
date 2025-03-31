@@ -1,9 +1,10 @@
 "use client"
 
-import {Feed} from "@/lib/feedApiCaller";
+import {Feed, getFeeds} from "@/lib/feedApiCaller";
 import {useCallback, useEffect, useRef, useState} from "react";
 import FeedItem from "@/components/FeedItem";
 import Spinner from "@/components/Spinner";
+import {useQuery} from "@tanstack/react-query";
 
 /**
  * Feed 스크롤링 목록 컴포넌트
@@ -11,43 +12,46 @@ import Spinner from "@/components/Spinner";
 export default function FeedScrollList() {
     const [feeds, setFeeds] = useState<Feed[]>([])
     const [page, setPage] = useState(0)
-    const [loading, setLoading] = useState(false)
+    const [isLast, setIsLast] = useState(false)
 
     const observerRef = useRef<IntersectionObserver>(null)
     const loadMoreRef = useRef<HTMLDivElement>(null)
 
+    const {data, isLoading, isError, error} = useQuery({
+        queryKey: ['getFeeds', {page}],
+        queryFn: () => getFeeds(page)
+    })
+
     const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
         const onLoadMore = (): void => {
-            if (loading) {
+            if (isLoading) {
                 return
             }
 
-            setLoading(true)
             console.log("Lading more feeds...")
 
-            // TODO API 연동
-            setTimeout(() => {
-                const newFeeds: Feed[] = [{
-                    id: page,
-                    title: "title1",
-                    content: "test content",
-                    author: "Tester1",
-                    isOwner: true,
-                    isFavorite: true,
-                    totalFavorites: 1
-                }]
-                setFeeds((prevState: Feed[]) => [...prevState, ...newFeeds])
-                setPage((prevState) => prevState + 1)
-                setLoading(false)
-            }, 800)
+            if (isError) {
+                window.alert('피드를 가져오는데 실패하였습니다.')
+                console.log(`getFeedQuery Error : ${error}`)
+            } else {
+                if (data !== undefined) {
+                    const newFeeds: Feed[] = data.body.feeds
+                    setFeeds((prevState: Feed[]) => [...prevState, ...newFeeds])
+                    setPage((prevState) => prevState + 1)
+
+                    if (newFeeds.length === 0) {
+                        setIsLast(true)
+                    }
+                }
+            }
         }
 
         const [entry] = entries
-        if (entry.isIntersecting && !loading) {
+        if (entry.isIntersecting && !isLoading && !isLast) {
             console.log("Intersection detected")
             onLoadMore()
         }
-    }, [page, loading])
+    }, [isLast, data, isError, error, isLoading])
 
     useEffect(() => {
         const currentRef = loadMoreRef.current
@@ -77,7 +81,7 @@ export default function FeedScrollList() {
             ))}
 
             <div ref={loadMoreRef} className="py-8 flex justify-center">
-                {loading ? <Spinner/> : <div className="h-10"></div>}
+                {isLoading ? <Spinner/> : <div className="h-10"></div>}
             </div>
         </div>
     )

@@ -1,3 +1,8 @@
+import {getAccessToken, validateResponse} from "@/lib/utils";
+import {BaseResponse} from "@/lib/models";
+
+const baseUrl = process.env.NEXT_PUBLIC_API_SERVER_URL
+
 export type Feed = {
     id: number,
     title: string,
@@ -6,4 +11,22 @@ export type Feed = {
     isOwner: boolean,
     isFavorite: boolean,
     totalFavorites: number,
+}
+
+export type FeedPage = {
+    feeds: Feed[],
+    totalPage: number,
+}
+
+export async function getFeeds(page: number): Promise<BaseResponse<FeedPage>> {
+    const token = getAccessToken()
+
+    const response: Response = await fetch(`${baseUrl}/api/feeds?page=${page}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+
+    return validateResponse(response)
 }

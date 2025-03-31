@@ -28,7 +28,6 @@ const preview: Preview = {
             handlers: [...handlers]
         }
     },
-    tags: ["autodocs"],
     decorators: [
         (Story) => {
             return (
