@@ -10,6 +10,12 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const AllFeeds: Story = {
     args: {}
+}
+
+export const MyFeeds: Story = {
+    args: {
+        onlyMe: true
+    }
 }

@@ -9,7 +9,7 @@ import {useQuery} from "@tanstack/react-query";
 /**
  * Feed 스크롤링 목록 컴포넌트
  */
-export default function FeedScrollList() {
+export default function FeedScrollList({onlyMe = false}: FeedScrollListProps) {
     const [feeds, setFeeds] = useState<Feed[]>([])
     const [page, setPage] = useState(0)
     const [isLast, setIsLast] = useState(false)
@@ -18,8 +18,8 @@ export default function FeedScrollList() {
     const loadMoreRef = useRef<HTMLDivElement>(null)
 
     const {data, isLoading, isError, error} = useQuery({
-        queryKey: ['getFeeds', {page}],
-        queryFn: () => getFeeds(page)
+        queryKey: ['getFeeds', {page, onlyMe}],
+        queryFn: () => getFeeds(page, onlyMe)
     })
 
     const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
@@ -85,4 +85,8 @@ export default function FeedScrollList() {
             </div>
         </div>
     )
+}
+
+interface FeedScrollListProps {
+    onlyMe?: boolean
 }

@@ -18,7 +18,7 @@ export type FeedPage = {
     totalPage: number,
 }
 
-export async function getFeeds(page: number): Promise<BaseResponse<FeedPage>> {
+export async function getFeeds(page: number, onlyMe: boolean): Promise<BaseResponse<FeedPage>> {
     let token: string = ''
     try {
         token = getAccessToken()
@@ -27,7 +27,8 @@ export async function getFeeds(page: number): Promise<BaseResponse<FeedPage>> {
         window.location.replace('/login')
     }
 
-    const response: Response = await fetch(`${baseUrl}/api/feeds?page=${page}`, {
+    const apiUrl = onlyMe ? '/api/feeds/me' : '/api/feeds'
+    const response: Response = await fetch(`${baseUrl}${apiUrl}?page=${page}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`
