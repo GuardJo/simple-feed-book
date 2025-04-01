@@ -32,6 +32,9 @@ export function getAccessToken(): string {
 export async function validateResponse(response: Response) {
     if (response.ok) {
         return response.json()
+    } else if (response.status === 401) {
+        console.log('go to login page')
+        window.location.replace('/login')
     } else {
         const errorMessage: string = await response.text()
         throw new Error(errorMessage)

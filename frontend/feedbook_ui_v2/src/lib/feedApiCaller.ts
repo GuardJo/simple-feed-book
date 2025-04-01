@@ -19,7 +19,13 @@ export type FeedPage = {
 }
 
 export async function getFeeds(page: number): Promise<BaseResponse<FeedPage>> {
-    const token = getAccessToken()
+    let token: string = ''
+    try {
+        token = getAccessToken()
+    } catch (error) {
+        console.log(error)
+        window.location.replace('/login')
+    }
 
     const response: Response = await fetch(`${baseUrl}/api/feeds?page=${page}`, {
         method: 'GET',

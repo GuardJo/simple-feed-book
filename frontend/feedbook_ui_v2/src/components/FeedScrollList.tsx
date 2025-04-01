@@ -31,8 +31,8 @@ export default function FeedScrollList() {
             console.log("Lading more feeds...")
 
             if (isError) {
+                console.log(`getFeedQuery Error : ${error.message}`)
                 window.alert('피드를 가져오는데 실패하였습니다.')
-                console.log(`getFeedQuery Error : ${error}`)
             } else {
                 if (data !== undefined) {
                     const newFeeds: Feed[] = data.body.feeds
