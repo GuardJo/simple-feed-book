@@ -2,6 +2,7 @@ import {http, HttpResponse} from "msw";
 
 const mockUrl = process.env.NEXT_PUBLIC_API_MOCK_URL
 const testToken = "TestToken"
+const AUTHORIZATION_HEADER_NAME: string = "Authorization"
 
 export const handlers = [
     http.post(`${mockUrl}/api/signup`, () => {
@@ -17,7 +18,7 @@ export const handlers = [
         })
     }),
     http.get(`${mockUrl}/api/feeds`, ({request}) => {
-        const token = request.headers.get('Authorization')
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
         const page = new URL(request.url).searchParams.get('page') ?? '0'
 
         if (token === null) {
@@ -84,7 +85,7 @@ export const handlers = [
         }
     }),
     http.get(`${mockUrl}/api/feeds/me`, ({request}) => {
-        const token = request.headers.get('Authorization')
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
         const page = new URL(request.url).searchParams.get('page') ?? '0'
 
         if (token === null) {
@@ -131,5 +132,19 @@ export const handlers = [
                 })
             }
         }
+    }),
+    http.delete(`${mockUrl}/api/feeds/:feedId`, ({request}) => {
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
+
+        if (token === null) {
+            return new HttpResponse("Unauthorized", {
+                status: 401
+            })
+        }
+
+        return HttpResponse.json({
+            status: "OK",
+            body: "SUCCESSES"
+        })
     })
 ]
