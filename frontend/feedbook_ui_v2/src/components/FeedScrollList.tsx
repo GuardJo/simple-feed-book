@@ -12,7 +12,6 @@ import {useQuery} from "@tanstack/react-query";
 export default function FeedScrollList({onlyMe = false}: FeedScrollListProps) {
     const [feeds, setFeeds] = useState<Feed[]>([])
     const [page, setPage] = useState(0)
-    const [isLast, setIsLast] = useState(false)
 
     const observerRef = useRef<IntersectionObserver>(null)
     const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -36,22 +35,21 @@ export default function FeedScrollList({onlyMe = false}: FeedScrollListProps) {
             } else {
                 if (data !== undefined) {
                     const newFeeds: Feed[] = data.body.feeds
-                    setFeeds((prevState: Feed[]) => [...prevState, ...newFeeds])
-                    setPage((prevState) => prevState + 1)
 
-                    if (newFeeds.length === 0) {
-                        setIsLast(true)
+                    if (newFeeds.length > 0) {
+                        setFeeds((prevState: Feed[]) => [...prevState, ...newFeeds])
+                        setPage((prevState) => prevState + 1)
                     }
                 }
             }
         }
 
         const [entry] = entries
-        if (entry.isIntersecting && !isLoading && !isLast) {
+        if (entry.isIntersecting && !isLoading) {
             console.log("Intersection detected")
             onLoadMore()
         }
-    }, [isLast, data, isError, error, isLoading])
+    }, [data, isError, error, isLoading])
 
     useEffect(() => {
         const currentRef = loadMoreRef.current
