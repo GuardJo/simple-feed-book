@@ -63,3 +63,18 @@ export async function removeFeed(feedId: number): Promise<BaseResponse<string>> 
 
     return validateResponse(response)
 }
+
+/**
+ * 특정 피드의 좋아요 갱신
+ * @param feedId 갱신할 피드 식별키
+ */
+export async function updateFavorite(feedId: number): Promise<BaseResponse<string>> {
+    const response: Response = await fetch(`${baseUrl}/api/feeds/favorites/${feedId}`, {
+        method: 'PUT',
+        headers: {
+            ...initHeaders()
+        }
+    })
+
+    return validateResponse(response)
+}

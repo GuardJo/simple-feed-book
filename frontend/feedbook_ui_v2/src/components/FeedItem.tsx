@@ -60,7 +60,7 @@ export default function FeedItem({feed}: FeedItemProps) {
             <div className="mb-4">{feed.content}</div>
 
             <div className="flex justify-between items-center">
-                <FeedLikeButton isLike={feed.isFavorite} defaultCount={feed.totalFavorites}/>
+                <FeedLikeButton feedId={feed.id} isLike={feed.isFavorite} defaultCount={feed.totalFavorites}/>
                 <button className="text-sm text-blue-600 hover:underline">Comments...</button>
             </div>
         </div>

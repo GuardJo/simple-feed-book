@@ -12,6 +12,7 @@ type Story = StoryObj<typeof meta>
 
 export const NoLike: Story = {
     args: {
+        feedId: 1,
         isLike: false,
         defaultCount: 0
     }
@@ -19,6 +20,7 @@ export const NoLike: Story = {
 
 export const HasLike: Story = {
     args: {
+        feedId: 1,
         isLike: false,
         defaultCount: 999
     }
@@ -26,6 +28,7 @@ export const HasLike: Story = {
 
 export const MyLike: Story = {
     args: {
+        feedId: 1,
         isLike: true,
         defaultCount: 111
     }

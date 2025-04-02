@@ -146,5 +146,19 @@ export const handlers = [
             status: "OK",
             body: "SUCCESSES"
         })
+    }),
+    http.put(`${mockUrl}/api/feeds/favorites/:feedId`, ({request}) => {
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
+
+        if (token === null) {
+            return new HttpResponse("Unauthorized", {
+                status: 401
+            })
+        }
+
+        return HttpResponse.json({
+            status: "OK",
+            body: "SUCCESSES"
+        })
     })
 ]
