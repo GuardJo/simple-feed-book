@@ -1,61 +1,54 @@
 "use client"
 
 import {useCallback, useEffect, useRef, useState} from "react";
-import {FeedComment} from "@/lib/feedApiCaller";
+import {FeedComment, getFeedComments} from "@/lib/feedApiCaller";
 import Spinner from "@/components/Spinner";
 import FeedCommentItem from "@/components/FeedCommentItem";
+import {useQuery} from "@tanstack/react-query";
 
 /**
  * 피드 댓글 스크롤링 목록 컴포넌트
  */
 export default function CommentScrollList({feedId}: CommentScrollListProps) {
     const [comments, setComments] = useState<FeedComment[]>([])
-    const [loading, setLoading] = useState(false)
     const [page, setPage] = useState(0)
 
     const observerRef = useRef<IntersectionObserver>(null)
     const loadMoreRef = useRef<HTMLDivElement>(null)
 
+    const {data, isLoading, isError, error} = useQuery({
+        queryKey: ['getFeedComments', {feedId, page}],
+        queryFn: () => getFeedComments(feedId, page)
+    })
+
     const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
         const onLoadMore = (): void => {
-            if (loading) {
+            if (isLoading) {
                 return
             }
 
-            console.log(`Loading more comments(feedId = ${feedId})...`)
+            console.log(`Loading more comments...`)
 
-            // TODO API 연동
-            const newComments: FeedComment[] = [{
-                id: page + 1,
-                author: 'Tester22',
-                createTime: new Date().toString(),
-                content: 'comment~'
-            }, {
-                id: page + 2,
-                author: 'Tester223',
-                createTime: new Date().toString(),
-                content: 'comment~'
-            }, {
-                id: page + 3,
-                author: 'Tester224',
-                createTime: new Date().toString(),
-                content: 'comment~'
-            }]
+            if (isError) {
+                console.log(`getFeedContents Error : ${error.message}`)
+            } else {
+                if (data !== undefined) {
+                    const newComments: FeedComment[] = data.body.comments
 
-            setLoading(false)
-
-            if (newComments.length > 0) {
-                setComments((prevState: FeedComment[]) => [...prevState, ...newComments])
-                setPage((prevState: number) => prevState + 1)
+                    if (newComments.length > 0) {
+                        setComments((prevState: FeedComment[]) => [...prevState, ...newComments])
+                        setPage((prevState: number) => prevState + 1)
+                    }
+                }
             }
         }
 
         const [entry] = entries
-        if (entry.isIntersecting && !loading) {
+        if (entry.isIntersecting && !isLoading) {
             console.log('Intersection detected')
             onLoadMore()
         }
-    }, [loading, page])
+    }, [data, isError, error, isLoading])
 
     useEffect(() => {
         const currentRef = loadMoreRef.current
@@ -80,11 +73,17 @@ export default function CommentScrollList({feedId}: CommentScrollListProps) {
 
     return (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {comments.map((comment) => (
-                <FeedCommentItem key={comment.id} comment={comment}/>
-            ))}
+            {comments.length === 0 ? (
+                <p className="text-cneter text-gray-500 py-8">댓글이 없습니다.</p>
+            ) : (
+                <>
+                    {comments.map((comment) => (
+                        <FeedCommentItem key={comment.id} comment={comment}/>
+                    ))}
+                </>
+            )}
             <div ref={loadMoreRef} className="py-8 flex justify-center">
-                {loading ? <Spinner/> : <div className="h-10"/>}
+                {isLoading ? <Spinner/> : <div className="h-10"/>}
             </div>
         </div>
     )

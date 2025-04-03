@@ -31,6 +31,11 @@ export type FeedComment = {
     content: string
 }
 
+export type FeedCommentPage = {
+    comments: FeedComment[],
+    totalPage: number,
+}
+
 const initHeaders = (): HeadersInit => {
     let token: string = ''
     try {
@@ -104,6 +109,22 @@ export async function updateFeed(request: FeedUpdateRequest): Promise<BaseRespon
             ...initHeaders()
         },
         body: JSON.stringify(request)
+    })
+
+    return validateResponse(response)
+}
+
+/**
+ * 특정 피드의 댓글 목록 반환
+ * @param feedId 피드 식별키
+ * @param page pagination 처리 기준 조회할 페이지
+ */
+export async function getFeedComments(feedId: number, page: number): Promise<BaseResponse<FeedCommentPage>> {
+    const response: Response = await fetch(`${baseUrl}/api/feeds/${feedId}/comments?page=${page}`, {
+        method: 'GET',
+        headers: {
+            ...initHeaders(),
+        }
     })
 
     return validateResponse(response)

@@ -1,4 +1,5 @@
 import {http, HttpResponse} from "msw";
+import {FeedComment} from "@/lib/feedApiCaller";
 
 const mockUrl = process.env.NEXT_PUBLIC_API_MOCK_URL
 const testToken = "TestToken"
@@ -174,5 +175,47 @@ export const handlers = [
             status: "OK",
             body: "SUCCESSES"
         })
+    }),
+    http.get(`${mockUrl}/api/feeds/:feedId/comments`, ({request, params}) => {
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
+        const page = new URL(request.url).searchParams.get('page') ?? '0'
+        const feedId = params.feedId
+
+        if (token === null) {
+            return new HttpResponse("Unauthorized", {
+                status: 401
+            })
+        } else {
+            const feedIdNumber: number = Number(feedId)
+            const pageNumber: number = Number(page)
+            if (feedIdNumber > 1 || pageNumber > 3) {
+                return HttpResponse.json({
+                    status: 'OK',
+                    body: {
+                        totalPage: 1,
+                        comments: [],
+                    }
+                })
+            } else {
+                const feedComments: FeedComment[] = []
+
+                for (let i = 0; i < 10; i++) {
+                    feedComments.push({
+                        id: i,
+                        author: `Tester${i}`,
+                        createTime: new Date().toString(),
+                        content: 'Test comment',
+                    })
+                }
+
+                return HttpResponse.json({
+                    status: "OK",
+                    body: {
+                        totalPage: 1,
+                        comments: feedComments
+                    }
+                })
+            }
+        }
     })
 ]
