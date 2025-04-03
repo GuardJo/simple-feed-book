@@ -33,3 +33,12 @@ export const MyLike: Story = {
         defaultCount: 111
     }
 }
+
+export const DisabledMyLike: Story = {
+    args: {
+        feedId: 1,
+        isLike: true,
+        defaultCount: 111,
+        disabled: true,
+    }
+}

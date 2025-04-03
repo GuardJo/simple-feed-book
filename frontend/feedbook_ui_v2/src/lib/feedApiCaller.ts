@@ -18,6 +18,12 @@ export type FeedPage = {
     totalPage: number,
 }
 
+export type FeedUpdateRequest = {
+    feedId: number,
+    title: string,
+    content: string,
+}
+
 const initHeaders = (): HeadersInit => {
     let token: string = ''
     try {
@@ -28,6 +34,7 @@ const initHeaders = (): HeadersInit => {
     }
 
     return {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
     }
 }
@@ -74,6 +81,22 @@ export async function updateFavorite(feedId: number): Promise<BaseResponse<strin
         headers: {
             ...initHeaders()
         }
+    })
+
+    return validateResponse(response)
+}
+
+/**
+ * 특정 피드의 제목/내용 갱신
+ * @param request feedId, title, content
+ */
+export async function updateFeed(request: FeedUpdateRequest): Promise<BaseResponse<string>> {
+    const response: Response = await fetch(`${baseUrl}/api/feeds`, {
+        method: 'PATCH',
+        headers: {
+            ...initHeaders()
+        },
+        body: JSON.stringify(request)
     })
 
     return validateResponse(response)

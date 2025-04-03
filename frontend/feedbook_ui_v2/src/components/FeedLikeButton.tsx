@@ -9,7 +9,7 @@ import {updateFavorite} from "@/lib/feedApiCaller";
 /**
  * 피드 좋아요 버튼 컴포넌트
  */
-export default function FeedLikeButton({feedId, isLike, defaultCount}: FeedLikeButtonProps) {
+export default function FeedLikeButton({feedId, isLike, defaultCount, disabled = false}: FeedLikeButtonProps) {
     const [liked, setLiked] = useState(isLike)
     const [likeCount, setLikeCount] = useState(defaultCount)
 
@@ -36,7 +36,7 @@ export default function FeedLikeButton({feedId, isLike, defaultCount}: FeedLikeB
     }
 
     return (
-        <button className="flex items-center space-x-1 group" onClick={handleLike}>
+        <button className="flex items-center space-x-1 group" onClick={handleLike} disabled={disabled}>
             <Heart size={18} className={cn(
                 "transition-colors",
                 liked ? "fill-red-500 text-red-500" : "text-gray-500 group-hover:text-red-500"
@@ -50,4 +50,5 @@ interface FeedLikeButtonProps {
     feedId: number,
     isLike: boolean,
     defaultCount: number,
+    disabled?: boolean
 }
