@@ -24,6 +24,13 @@ export type FeedUpdateRequest = {
     content: string,
 }
 
+export type FeedComment = {
+    id: number,
+    author: string,
+    createTime: string,
+    content: string
+}
+
 const initHeaders = (): HeadersInit => {
     let token: string = ''
     try {
