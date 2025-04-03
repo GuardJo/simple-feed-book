@@ -2,7 +2,7 @@
 
 import {Edit, Save, Trash2, X} from "lucide-react";
 import FeedLikeButton from "@/components/FeedLikeButton";
-import {Feed, removeFeed} from "@/lib/feedApiCaller";
+import {Feed, FeedUpdateRequest, removeFeed, updateFeed} from "@/lib/feedApiCaller";
 import ActionAlert from "@/components/ActionAlert";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ChangeEvent, useState} from "react";
@@ -33,6 +33,21 @@ export default function FeedItem({feed}: FeedItemProps) {
         }
     })
 
+    const feedUpdateMutation = useMutation({
+        mutationKey: ['updateFeed', feed.id],
+        mutationFn: (request: FeedUpdateRequest) => updateFeed(request),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['getFeeds'],
+                refetchType: "all"
+            })
+            setIsEditMode(false)
+        },
+        onError: (error) => {
+            window.alert(error.message)
+        }
+    })
+
     const handleEditFeed = () => {
         setIsEditMode(true)
     }
@@ -47,8 +62,11 @@ export default function FeedItem({feed}: FeedItemProps) {
 
     const handleUpdateFeed = () => {
         console.log(`Updated feed, id = ${feed.id}`)
-        // TODO API 연동
-        setIsEditMode(false)
+        feedUpdateMutation.mutate({
+            feedId: feed.id,
+            title: feedTitle,
+            content: feedContent
+        })
     }
 
     const handleRemoveFeed = () => {
