@@ -4,6 +4,7 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import {X} from "lucide-react";
 import CommentScrollList from "@/components/CommentScrollList";
 import {cn} from "@/lib/utils";
+import FeedCommentForm from "@/components/FeedCommentForm";
 
 /**
  * 피드 별 댓글 조회 모달 컴포넌트
@@ -78,6 +79,7 @@ export default function FeedCommentModal({open, onCloseAction, feedId}: FeedComm
                 </div>
 
                 <CommentScrollList feedId={feedId}/>
+                <FeedCommentForm feedId={feedId}/>
             </div>
         </div>
     )
