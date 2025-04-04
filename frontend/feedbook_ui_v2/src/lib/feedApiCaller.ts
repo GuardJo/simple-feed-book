@@ -36,6 +36,11 @@ export type FeedCommentPage = {
     totalPage: number,
 }
 
+export type FeedCommentCreateRequest = {
+    feedId: number,
+    content: string,
+}
+
 const initHeaders = (): HeadersInit => {
     let token: string = ''
     try {
@@ -125,6 +130,25 @@ export async function getFeedComments(feedId: number, page: number): Promise<Bas
         headers: {
             ...initHeaders(),
         }
+    })
+
+    return validateResponse(response)
+}
+
+/**
+ * 특정 피드의 신규 댓글 생성
+ * @param feedId 피드 식별키
+ * @param comment 신규 생성할 댓글 내용
+ */
+export async function saveNewFeedComment({feedId, content}: FeedCommentCreateRequest): Promise<BaseResponse<string>> {
+    const response: Response = await fetch(`${baseUrl}/api/feeds/${feedId}/comments`, {
+        method: 'POST',
+        headers: {
+            ...initHeaders(),
+        },
+        body: JSON.stringify({
+            content: content
+        })
     })
 
     return validateResponse(response)

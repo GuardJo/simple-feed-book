@@ -1,5 +1,6 @@
 import {Meta, StoryObj} from "@storybook/react";
 import FeedCommentForm from "@/components/FeedCommentForm";
+import {fn} from "@storybook/test";
 
 const meta = {
     title: 'Components/FeedCommentForm',
@@ -12,6 +13,8 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
     args: {
-        feedId: 1,
+        value: '',
+        onChangeAction: fn(() => console.log('onChangeAction')),
+        onSubmitAction: fn(() => console.log('onSubmitAction'))
     }
 }
