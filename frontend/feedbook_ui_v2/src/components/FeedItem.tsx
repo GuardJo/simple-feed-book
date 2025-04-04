@@ -6,6 +6,7 @@ import {Feed, FeedUpdateRequest, removeFeed, updateFeed} from "@/lib/feedApiCall
 import ActionAlert from "@/components/ActionAlert";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ChangeEvent, useState} from "react";
+import FeedCommentButton from "@/components/FeedCommentButton";
 
 /**
  * 피드 컴포넌트
@@ -127,9 +128,11 @@ export default function FeedItem({feed}: FeedItemProps) {
             }
 
             <div className="flex justify-between items-center">
-                <FeedLikeButton feedId={feed.id} isLike={feed.isFavorite} defaultCount={feed.totalFavorites}
-                                disabled={isEditMode}/>
-                <button className="text-sm text-blue-600 hover:underline">Comments...</button>
+                <div className="flex items-center space-x-3">
+                    <FeedLikeButton feedId={feed.id} isLike={feed.isFavorite} defaultCount={feed.totalFavorites}
+                                    disabled={isEditMode}/>
+                    <FeedCommentButton feedId={feed.id} disabled={isEditMode}/>
+                </div>
             </div>
         </div>
     )
