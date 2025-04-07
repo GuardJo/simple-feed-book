@@ -33,7 +33,9 @@ public class FeedDtoRepositoryImpl extends QuerydslRepositorySupport implements 
                         qFeed.account.nickname,
                         isOwner,
                         isFavorite,
-                        qFeed.favorites));
+                        qFeed.favorites))
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset());
 
         return new PageImpl<>(query.fetch(), pageable, query.fetchCount());
     }
