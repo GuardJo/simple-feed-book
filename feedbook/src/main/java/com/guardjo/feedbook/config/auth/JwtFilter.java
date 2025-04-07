@@ -9,11 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
             ServletException,
             IOException {
 
-        if (!(request.getMethod().equals(HttpMethod.OPTIONS.name()) || request.getRequestURI().equals(UrlContext.LOGIN_URL) || request.getRequestURI().equals(UrlContext.SIGNUP_URL))) {
+        if (!(CorsUtils.isPreFlightRequest(request) || request.getRequestURI().equals(UrlContext.LOGIN_URL) || request.getRequestURI().equals(UrlContext.SIGNUP_URL))) {
             String token = request.getHeader(HttpHeaders.AUTHORIZATION);
 
             if (!StringUtils.hasText(token)) {
