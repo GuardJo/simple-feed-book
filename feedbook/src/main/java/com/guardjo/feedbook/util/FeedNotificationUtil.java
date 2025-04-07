@@ -24,11 +24,13 @@ public class FeedNotificationUtil {
         log.debug("Send Alarm Event, accountId = {}", accountId);
         AlarmSubscriber subscriber = alarmSubscriberRepository.getClient(accountId);
 
-        try {
-            subscriber.send("Update Alarm");
-        } catch (IOException e) {
-            log.warn("Failed to send Alarm Event, accountId = {}", accountId);
-            alarmSubscriberRepository.deleteClient(accountId);
+        if (Objects.nonNull(subscriber)) {
+            try {
+                subscriber.send("Update Alarm");
+            } catch (IOException e) {
+                log.warn("Failed to send Alarm Event, accountId = {}", accountId);
+                alarmSubscriberRepository.deleteClient(accountId);
+            }
         }
     }
 
