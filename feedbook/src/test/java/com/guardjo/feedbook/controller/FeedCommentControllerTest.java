@@ -152,8 +152,8 @@ class FeedCommentControllerTest {
         given(feedCommentService.findAllFeedComments(any(Pageable.class), eq(feedId))).willReturn(feedCommentPage);
 
         String response = mockMvc.perform(get(UrlContext.FEED_COMMENTS_URL.replace("{feedId}", String.valueOf(feedId)))
-                        .requestAttr("size", size)
-                        .requestAttr("page", page)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, TEST_TOKEN)
                         .with(csrf()))

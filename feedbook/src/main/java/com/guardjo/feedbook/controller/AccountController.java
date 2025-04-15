@@ -1,5 +1,6 @@
 package com.guardjo.feedbook.controller;
 
+import com.guardjo.feedbook.controller.docs.AccountApiDoc;
 import com.guardjo.feedbook.controller.request.LoginRequest;
 import com.guardjo.feedbook.controller.request.SignupRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
@@ -18,10 +19,11 @@ import java.util.Objects;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class AccountController {
+public class AccountController implements AccountApiDoc {
     private final AccountService accountService;
 
     @PostMapping(UrlContext.SIGNUP_URL)
+    @Override
     public BaseResponse<String> signup(@RequestBody SignupRequest signupRequest) {
         log.info("POST : {}, username = {}", UrlContext.SIGNUP_URL, signupRequest.username());
 
@@ -39,6 +41,7 @@ public class AccountController {
     }
 
     @PostMapping(UrlContext.LOGIN_URL)
+    @Override
     public BaseResponse<String> login(@RequestBody LoginRequest loginRequest) {
         log.info("POST : {}, username = {}", UrlContext.LOGIN_URL, loginRequest.username());
 
