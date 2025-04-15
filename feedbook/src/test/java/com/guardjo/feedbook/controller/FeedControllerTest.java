@@ -120,6 +120,7 @@ class FeedControllerTest {
         given(feedService.getAllFeeds(any(Pageable.class), any(Account.class))).willReturn(feeds);
 
         String response = mockMvc.perform(get(UrlContext.FEEDS_URL)
+                        .param("page", "0")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, token))
                 .andDo(print())
@@ -150,6 +151,7 @@ class FeedControllerTest {
         given(feedService.getMyFeeds(any(Pageable.class), eq(TEST_PRINCIPAL.getAccount()))).willReturn(feeds);
 
         String response = mockMvc.perform(get(UrlContext.MY_FEEDS_URL)
+                        .param("page", "0")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, token))
                 .andDo(print())

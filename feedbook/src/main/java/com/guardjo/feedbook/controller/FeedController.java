@@ -1,6 +1,7 @@
 package com.guardjo.feedbook.controller;
 
 import com.guardjo.feedbook.config.auth.AccountPrincipal;
+import com.guardjo.feedbook.controller.docs.FeedApiDoc;
 import com.guardjo.feedbook.controller.request.FeedCreateRequest;
 import com.guardjo.feedbook.controller.request.FeedModifyRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
@@ -11,11 +12,11 @@ import com.guardjo.feedbook.model.domain.types.AlarmArgs;
 import com.guardjo.feedbook.model.domain.types.AlarmType;
 import com.guardjo.feedbook.service.FeedAlarmService;
 import com.guardjo.feedbook.service.FeedService;
+import com.guardjo.feedbook.util.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +27,12 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class FeedController {
+public class FeedController implements FeedApiDoc {
     private final FeedService feedService;
     private final FeedAlarmService feedAlarmService;
 
     @PostMapping(UrlContext.FEEDS_URL)
+    @Override
     public BaseResponse<String> createFeed(@RequestBody FeedCreateRequest feedCreateRequest, @AuthenticationPrincipal AccountPrincipal principal) {
         log.info("POST : {}, username = {}", UrlContext.FEEDS_URL, principal.getUsername());
 
@@ -46,11 +48,15 @@ public class FeedController {
     }
 
     @GetMapping(UrlContext.FEEDS_URL)
-    public BaseResponse<FeedPageDto> getFeedPage(@PageableDefault Pageable pageable, @AuthenticationPrincipal AccountPrincipal principal) {
+    @Override
+    public BaseResponse<FeedPageDto> getFeedPage(@AuthenticationPrincipal AccountPrincipal principal,
+                                                 @RequestParam("page") int pageNumber,
+                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize) {
         log.info("GET : {}, username = {}", UrlContext.FEEDS_URL, principal.getUsername());
 
         Account account = principal.getAccount();
 
+        Pageable pageable = PaginationUtils.fromSortByCreatedAtDesc(pageNumber, pageSize);
         Page<FeedDto> feeds = feedService.getAllFeeds(pageable, account);
 
         FeedPageDto feedPageDto = initFeedPageDto(feeds);
@@ -62,11 +68,15 @@ public class FeedController {
     }
 
     @GetMapping(UrlContext.MY_FEEDS_URL)
-    public BaseResponse<FeedPageDto> getMyFeedPage(@PageableDefault Pageable pageable, @AuthenticationPrincipal AccountPrincipal principal) {
+    @Override
+    public BaseResponse<FeedPageDto> getMyFeedPage(@AuthenticationPrincipal AccountPrincipal principal,
+                                                   @RequestParam("page") int pageNumber,
+                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize) {
         log.info("GET : {}, username = {}", UrlContext.MY_FEEDS_URL, principal.getUsername());
 
         Account account = principal.getAccount();
 
+        Pageable pageable = PaginationUtils.fromSortByCreatedAtDesc(pageNumber, pageSize);
         Page<FeedDto> feeds = feedService.getMyFeeds(pageable, account);
 
         FeedPageDto feedPageDto = initFeedPageDto(feeds);
@@ -78,6 +88,7 @@ public class FeedController {
     }
 
     @PatchMapping(UrlContext.FEEDS_URL)
+    @Override
     public BaseResponse<String> updateFeed(@RequestBody FeedModifyRequest feedModifyRequest, @AuthenticationPrincipal AccountPrincipal principal) {
         log.info("PATCH : {}, username = {}", UrlContext.FEEDS_URL, principal.getUsername());
 
@@ -93,6 +104,7 @@ public class FeedController {
     }
 
     @DeleteMapping(UrlContext.FEEDS_URL + "/{feedId}")
+    @Override
     public BaseResponse<String> deleteFeed(@PathVariable long feedId, @AuthenticationPrincipal AccountPrincipal principal) {
         log.info("DELETE : {}/{}, username = {}", UrlContext.FEEDS_URL, feedId, principal.getUsername());
 
@@ -102,6 +114,7 @@ public class FeedController {
     }
 
     @PutMapping(UrlContext.FAVORITE_FEEDS_URL + "/{feedId}")
+    @Override
     public BaseResponse<String> updateFavoriteFeed(@PathVariable long feedId, @AuthenticationPrincipal AccountPrincipal principal) {
         Account account = principal.getAccount();
         log.info("PUT : {}/{}, username = {}", UrlContext.FAVORITE_FEEDS_URL, feedId, principal.getUsername());

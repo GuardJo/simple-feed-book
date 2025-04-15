@@ -90,6 +90,7 @@ class AlarmControllerTest {
         given(feedAlarmService.findAllFeedAlarmByAccount(eq(TEST_PRINCIPAL.getAccount()), any(Pageable.class))).willReturn(expected);
 
         String response = mockMvc.perform(get(UrlContext.ALARMS_URL)
+                        .param("page", "0")
                         .header(HttpHeaders.AUTHORIZATION, TEST_TOKEN)
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -146,7 +147,7 @@ class AlarmControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(String.format("data:%s\n\n", expected)));
-		
+
         then(feedAlarmService).should().connectAlarmSubscriber(eq(TEST_PRINCIPAL.getAccount().getId()));
     }
 }
