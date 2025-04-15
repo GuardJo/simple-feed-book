@@ -17,9 +17,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final String[] permitUrls = {
+            UrlContext.LOGIN_URL,
+            UrlContext.SIGNUP_URL,
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -29,7 +38,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthManager jwtAuthManager, JwtProvider jwtProvider) throws
             Exception {
         httpSecurity.authorizeHttpRequests(registry -> {
-                    registry.requestMatchers(UrlContext.LOGIN_URL, UrlContext.SIGNUP_URL)
+                    registry.requestMatchers(permitUrls)
                             .permitAll()
                             .requestMatchers(HttpMethod.OPTIONS)
                             .permitAll()
@@ -40,7 +49,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtFilter(jwtAuthManager, jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtAuthManager, jwtProvider, List.of(permitUrls)), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(configure -> {
                     configure.authenticationEntryPoint(new CustomAuthEntryPoint());
                 });
