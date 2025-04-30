@@ -1,0 +1,90 @@
+"use client"
+
+import {Feed, getFeeds} from "@/lib/feedApiCaller";
+import {useCallback, useEffect, useRef, useState} from "react";
+import FeedItem from "@/components/FeedItem";
+import Spinner from "@/components/Spinner";
+import {useQuery} from "@tanstack/react-query";
+
+/**
+ * Feed 스크롤링 목록 컴포넌트
+ */
+export default function FeedScrollList({onlyMe = false}: FeedScrollListProps) {
+    const [feeds, setFeeds] = useState<Feed[]>([])
+    const [page, setPage] = useState(0)
+
+    const observerRef = useRef<IntersectionObserver>(null)
+    const loadMoreRef = useRef<HTMLDivElement>(null)
+
+    const {data, isLoading, isError, error} = useQuery({
+        queryKey: ['getFeeds', {page, onlyMe}],
+        queryFn: () => getFeeds(page, onlyMe)
+    })
+
+    const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
+        const onLoadMore = (): void => {
+            if (isLoading) {
+                return
+            }
+
+            console.log("Lading more feeds...")
+
+            if (isError) {
+                console.log(`getFeedQuery Error : ${error.message}`)
+                window.alert('피드를 가져오는데 실패하였습니다.')
+            } else {
+                if (data !== undefined) {
+                    const newFeeds: Feed[] = data.body.feeds
+
+                    if (newFeeds.length > 0) {
+                        setFeeds((prevState: Feed[]) => [...prevState, ...newFeeds])
+                        setPage((prevState) => prevState + 1)
+                    }
+                }
+            }
+        }
+
+        const [entry] = entries
+        if (entry.isIntersecting && !isLoading) {
+            console.log("Intersection detected")
+            onLoadMore()
+        }
+    }, [data, isError, error, isLoading])
+
+    useEffect(() => {
+        const currentRef = loadMoreRef.current
+
+        if (currentRef) {
+            observerRef.current = new IntersectionObserver(observerCallback, {
+                root: null,
+                rootMargin: "100px",
+                threshold: 0.1
+            })
+
+            observerRef.current.observe(currentRef)
+            console.log("Observe set up")
+        }
+
+        return () => {
+            if (observerRef.current && currentRef) {
+                observerRef.current.unobserve(currentRef)
+            }
+        }
+    }, [observerCallback]);
+
+    return (
+        <div className="space-y-4">
+            {feeds.map((feed) => (
+                <FeedItem key={feed.id} feed={feed}/>
+            ))}
+
+            <div ref={loadMoreRef} className="py-8 flex justify-center">
+                {isLoading ? <Spinner/> : <div className="h-10"></div>}
+            </div>
+        </div>
+    )
+}
+
+interface FeedScrollListProps {
+    onlyMe?: boolean
+}

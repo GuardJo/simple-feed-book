@@ -1,4 +1,5 @@
 import {BaseResponse} from "@/lib/models";
+import {validateResponse} from "@/lib/utils";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_SERVER_URL
 
@@ -43,13 +44,4 @@ export async function login(request: LoginRequest): Promise<BaseResponse<string>
     });
 
     return await validateResponse(response)
-}
-
-async function validateResponse(response: Response) {
-    if (response.ok) {
-        return response.json()
-    } else {
-        const errorMessage: string = await response.text()
-        throw new Error(errorMessage)
-    }
 }

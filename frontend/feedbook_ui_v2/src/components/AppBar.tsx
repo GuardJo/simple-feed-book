@@ -31,16 +31,20 @@ export default function AppBar({children}: AppbarProps) {
                         <h2 className="text-lg font-medium">Menu</h2>
                     </div>
                     <nav className="flex flex-col">
-                        <Link href="/feeds" className="border-b py-3 px-4 hover:bg-gray-50">
+                        <Link href="/feeds" className="border-b py-3 px-4 hover:bg-gray-50"
+                              onClick={() => setOpenSidebar(false)}>
                             All Feeds
                         </Link>
-                        <Link href="/my-feeds" className="border-b py-3 px-4 hover:bg-gray-50">
+                        <Link href="/my-feeds" className="border-b py-3 px-4 hover:bg-gray-50"
+                              onClick={() => setOpenSidebar(false)}>
                             My Feeds
                         </Link>
-                        <Link href="/edit-feeds" className="border-b py-3 px-4 hover:bg-gray-50">
+                        <Link href="/edit-feeds" className="border-b py-3 px-4 hover:bg-gray-50"
+                              onClick={() => setOpenSidebar(false)}>
                             Write Feed
                         </Link>
-                        <Link href="/alarms" className="border-b py-3 px-4 hover:bg-gray-50">
+                        <Link href="/alarms" className="border-b py-3 px-4 hover:bg-gray-50"
+                              onClick={() => setOpenSidebar(false)}>
                             Alarms
                         </Link>
                         <div className="mt-auto p-4">
