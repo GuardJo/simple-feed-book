@@ -4,6 +4,7 @@ import MswProvider from "../src/containers/MswProvider";
 import QueryProvider from "../src/containers/QueryProvider";
 import {initialize, mswLoader} from "msw-storybook-addon";
 import {handlers} from "../src/mocks/handlers";
+import {setAccessToken} from "../src/lib/utils"
 
 initialize()
 
@@ -30,6 +31,7 @@ const preview: Preview = {
     },
     decorators: [
         (Story) => {
+            setAccessToken("TestToken-storybook")
             return (
                 <MswProvider>
                     <QueryProvider>
