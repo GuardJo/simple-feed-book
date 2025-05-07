@@ -41,6 +41,11 @@ export type FeedCommentCreateRequest = {
     content: string,
 }
 
+export type FeedCreateRequest = {
+    title: string,
+    content: string,
+}
+
 const initHeaders = (): HeadersInit => {
     let token: string = ''
     try {
@@ -149,6 +154,22 @@ export async function saveNewFeedComment({feedId, content}: FeedCommentCreateReq
         body: JSON.stringify({
             content: content
         })
+    })
+
+    return validateResponse(response)
+}
+
+/**
+ * 신규 피드 생성
+ * @param createRequest (title, content)
+ */
+export async function saveNewFeed(createRequest: FeedCreateRequest): Promise<BaseResponse<string>> {
+    const response: Response = await fetch(`${baseUrl}/api/feeds`, {
+        method: 'POST',
+        headers: {
+            ...initHeaders(),
+        },
+        body: JSON.stringify(createRequest)
     })
 
     return validateResponse(response)
