@@ -43,9 +43,9 @@ export default function AppBar({children}: AppbarProps) {
                               onClick={() => setOpenSidebar(false)}>
                             Write Feed
                         </Link>
-                        <Link href="/alarms" className="border-b py-3 px-4 hover:bg-gray-50"
+                        <Link href="/notification" className="border-b py-3 px-4 hover:bg-gray-50"
                               onClick={() => setOpenSidebar(false)}>
-                            Alarms
+                            Notification
                         </Link>
                         <div className="mt-auto p-4">
                             <Button asChild
