@@ -1,16 +1,22 @@
 "use client"
 
-import {Notification} from "@/lib/notificationApiCaller";
+import {getNotifications, Notification} from "@/lib/notificationApiCaller";
 import NotificationItem from "@/components/NotificationItem";
 import {useCallback, useEffect, useRef, useState} from "react";
 import Loading from "@/app/loading";
+import {useQuery} from "@tanstack/react-query";
 
 export default function NotificationScrollList() {
     const [notifications, setNotifications] = useState<Notification[]>([])
-    const [isLoading, setIsLoading] = useState(false)
+    const [page, setPage] = useState(0)
 
     const observerRef = useRef<IntersectionObserver>(null)
     const loadMoreRef = useRef<HTMLDivElement>(null)
+
+    const {data, isError, error, isLoading} = useQuery({
+        queryKey: ['getNotifications', {page}],
+        queryFn: () => getNotifications(page)
+    })
 
     const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
         const onLoadMore = (): void => {
@@ -18,20 +24,21 @@ export default function NotificationScrollList() {
                 return
             }
 
-            setIsLoading(true)
             console.log("Loading more noti...")
 
-            const mockNotifications: Notification[] = [
-                {alarmText: 'test1', alarmTime: '1시간'},
-                {alarmText: 'test2', alarmTime: '1시간'},
-                {alarmText: 'test3', alarmTime: '1시간'},
-            ]
+            if (isError) {
+                console.log(`getNotifications Error : ${error.message}`)
+                window.alert('알림 목록을 가져오는데 실패하였습니다.')
+            } else {
+                if (data !== undefined) {
+                    const newNotifications = data.body.feedAlarms
 
-            // TODO API 연동
-            setTimeout(() => {
-                setNotifications((prevState: Notification[]) => [...prevState, ...mockNotifications])
-                setIsLoading(false)
-            }, 500)
+                    if (newNotifications.length > 0) {
+                        setNotifications((prevState: Notification[]) => [...prevState, ...newNotifications])
+                        setPage((prevState: number) => prevState + 1)
+                    }
+                }
+            }
         }
 
         const [entry] = entries
@@ -39,7 +46,7 @@ export default function NotificationScrollList() {
             console.log("Intersecting...")
             onLoadMore()
         }
-    }, [])
+    }, [data, isError, error, isLoading])
 
     useEffect(() => {
         const currentRef = loadMoreRef.current
@@ -63,8 +70,8 @@ export default function NotificationScrollList() {
 
     return (
         <div className="space-y-3">
-            {notifications.map((notification) => (
-                <NotificationItem notification={notification}/>
+            {notifications.map((notification, index) => (
+                <NotificationItem key={index} notification={notification}/>
             ))}
             <div ref={loadMoreRef} className="py-8 flex justify-center">
                 {isLoading ? <Loading/> : <div className="h-10"/>}

@@ -1,5 +1,6 @@
 import {http, HttpResponse} from "msw";
 import {FeedComment} from "@/lib/feedApiCaller";
+import {Notification} from "@/lib/notificationApiCaller";
 
 const mockUrl = process.env.NEXT_PUBLIC_API_MOCK_URL
 const testToken = "TestToken"
@@ -244,6 +245,43 @@ export const handlers = [
                 status: 'OK',
                 body: 'SUCCESSES'
             })
+        }
+    }),
+    http.get(`${mockUrl}/api/accounts/alarms`, ({request}) => {
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
+        const page = new URL(request.url).searchParams.get('page') ?? '0'
+
+        if (token === null) {
+            return new HttpResponse("Unauthorized", {
+                status: 401
+            })
+        } else {
+            let pageNumber = Number(page)
+
+            if (pageNumber >= 2) {
+                return HttpResponse.json({
+                    status: 'OK',
+                    body: {
+                        totalSize: 13,
+                        pageNumber: page,
+                        feedAlarms: []
+                    }
+                })
+            } else {
+                let notis: Notification[] = []
+                for (let i = 0; i < 10; i++) {
+                    notis.push({alarmText: `Test_${page}_${i}`, alarmTime: '1일'})
+                }
+
+                return HttpResponse.json({
+                    status: "OK",
+                    body: {
+                        totalSize: 30,
+                        pageNumber: page,
+                        feedAlarms: notis,
+                    }
+                })
+            }
         }
     })
 ]

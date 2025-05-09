@@ -1,4 +1,4 @@
-import {getAccessToken, validateResponse} from "@/lib/utils";
+import {initHeaders, validateResponse} from "@/lib/utils";
 import {BaseResponse} from "@/lib/models";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_SERVER_URL
@@ -44,21 +44,6 @@ export type FeedCommentCreateRequest = {
 export type FeedCreateRequest = {
     title: string,
     content: string,
-}
-
-const initHeaders = (): HeadersInit => {
-    let token: string = ''
-    try {
-        token = getAccessToken()
-    } catch (error) {
-        console.log(error)
-        window.location.replace('/login')
-    }
-
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    }
 }
 
 /**
