@@ -256,7 +256,7 @@ export const handlers = [
                 status: 401
             })
         } else {
-            let pageNumber = Number(page)
+            const pageNumber: number = Number(page)
 
             if (pageNumber >= 2) {
                 return HttpResponse.json({
@@ -268,7 +268,7 @@ export const handlers = [
                     }
                 })
             } else {
-                let notis: Notification[] = []
+                const notis: Notification[] = []
                 for (let i = 0; i < 10; i++) {
                     notis.push({alarmText: `Test_${page}_${i}`, alarmTime: '1일'})
                 }
