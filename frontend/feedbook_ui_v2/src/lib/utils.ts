@@ -29,6 +29,24 @@ export function getAccessToken(): string {
     }
 }
 
+/**
+ * 인증 토큰을 헤더에 추가하여 반환한다.
+ */
+export function initHeaders(): HeadersInit {
+    let token: string = ''
+    try {
+        token = getAccessToken()
+    } catch (error) {
+        console.log(error)
+        window.location.replace('/login')
+    }
+
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    }
+}
+
 export async function validateResponse(response: Response) {
     if (response.ok) {
         return response.json()
