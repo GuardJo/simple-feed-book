@@ -4,6 +4,9 @@ import com.guardjo.feedbook.model.domain.AlarmSubscriber;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class AlarmSubscriberRepositoryTest {
@@ -23,14 +26,17 @@ class AlarmSubscriberRepositoryTest {
 
     @DisplayName("알람 구독 client 제거")
     @Test
-    void test_deleteClient() {
+    void test_deleteClient() throws IllegalAccessException, NoSuchFieldException {
         Long accountId = 1L;
 
         alarmSubscriberRepository.addClient(accountId);
         alarmSubscriberRepository.deleteClient(accountId);
 
-        AlarmSubscriber subscriber = alarmSubscriberRepository.getClient(accountId);
+        Field subsciberMapField = alarmSubscriberRepository.getClass().getDeclaredField("subscribeStorage");
+        subsciberMapField.setAccessible(true);
 
-        assertThat(subscriber).isNull();
+        Map<?, ?> subscriberMap = (Map<?, ?>) subsciberMapField.get(alarmSubscriberRepository);
+
+        assertThat(subscriberMap.containsKey(accountId)).isFalse();
     }
 }
