@@ -283,5 +283,26 @@ export const handlers = [
                 })
             }
         }
+    }),
+    http.get(`${mockUrl}/api/accounts/alarms/sub`, ({request}) => {
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
+
+        if (token === null) {
+            return new HttpResponse("Unauthorized", {
+                status: 401
+            })
+        } else {
+            const stream = new ReadableStream({
+                start() {
+                    // mocking event-stream
+                }
+            })
+
+            return new HttpResponse(stream, {
+                headers: {
+                    'Content-Type': 'text/event-stream',
+                }
+            })
+        }
     })
 ]

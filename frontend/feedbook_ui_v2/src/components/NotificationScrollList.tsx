@@ -1,6 +1,6 @@
 "use client"
 
-import {getNotifications, Notification} from "@/lib/notificationApiCaller";
+import {getNotifications, Notification, subscribeAlarms} from "@/lib/notificationApiCaller";
 import NotificationItem from "@/components/NotificationItem";
 import {useCallback, useEffect, useRef, useState} from "react";
 import Loading from "@/app/loading";
@@ -17,6 +17,23 @@ export default function NotificationScrollList() {
         queryKey: ['getNotifications', {page}],
         queryFn: () => getNotifications(page)
     })
+
+    const alarmEventCallback = (message: string): void => {
+        setNotifications(prevState => {
+            const newNotifications: Notification[] = [
+                {
+                    alarmText: message,
+                    alarmTime: '방금'
+                }
+            ]
+
+            return [...newNotifications, ...prevState]
+        })
+    }
+
+    const alarmEventErrorCallback = (): void => {
+        console.log('Error subscribing alarm event')
+    }
 
     const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
         const onLoadMore = (): void => {
@@ -40,7 +57,7 @@ export default function NotificationScrollList() {
                 }
             }
         }
-
+        
         const [entry] = entries
         if (entry.isIntersecting && !isLoading) {
             console.log("Intersecting...")
@@ -67,6 +84,14 @@ export default function NotificationScrollList() {
             }
         }
     }, [observerCallback]);
+
+    useEffect(() => {
+        const eventSource = subscribeAlarms(alarmEventCallback, alarmEventErrorCallback)
+
+        return () => {
+            eventSource.close()
+        }
+    }, [])
 
     return (
         <div className="space-y-3">
