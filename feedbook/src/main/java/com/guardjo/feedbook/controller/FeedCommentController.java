@@ -38,7 +38,7 @@ public class FeedCommentController implements FeedCommentApiDoc {
 
         if (request.isValid()) {
             feedCommentService.createNewComment(request.content(), account, feedId);
-            feedAlarmService.saveNewAlarm(AlarmType.COMMENT, new AlarmArgs(account.getId()), feedId);
+            feedAlarmService.saveNewAlarm(AlarmType.COMMENT, new AlarmArgs(account.getId(), account.getNickname()), feedId);
         } else {
             throw new IllegalArgumentException("Content is Empty");
         }

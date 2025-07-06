@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -55,7 +56,7 @@ class FeedAlarmServiceTest {
         long feedId = TEST_FEED.getId();
 
         ArgumentCaptor<FeedAlarm> argumentCaptor = ArgumentCaptor.forClass(FeedAlarm.class);
-        given(feedRepository.getReferenceById(eq(feedId))).willReturn(TEST_FEED);
+        given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(TEST_FEED));
         given(feedAlarmRepository.save(argumentCaptor.capture())).willReturn(mock(FeedAlarm.class));
         willDoNothing().given(feedNotificationUtil).sendAlarmUpdateEvent(eq(alarmArgs.accountId()));
 
@@ -68,7 +69,7 @@ class FeedAlarmServiceTest {
         assertThat(actual.getAlarmType()).isEqualTo(alarmType);
         assertThat(actual.getArgs()).isEqualTo(alarmArgs);
 
-        then(feedRepository).should().getReferenceById(eq(feedId));
+        then(feedRepository).should().findById(eq(feedId));
         then(feedAlarmRepository).should().save(any(FeedAlarm.class));
         then(feedNotificationUtil).should().sendAlarmUpdateEvent(eq(alarmArgs.accountId()));
     }
@@ -78,7 +79,7 @@ class FeedAlarmServiceTest {
     void test_findAllFeedAlarmByAccount() {
         Account account = TestDataGenerator.account(99L, "Tester222");
         Pageable pageable = PageRequest.of(0, 10);
-        Page<FeedAlarm> expected = new PageImpl<>(List.of(TestDataGenerator.feedAlarm(AlarmType.COMMENT, new AlarmArgs(account.getId()), TEST_FEED)));
+        Page<FeedAlarm> expected = new PageImpl<>(List.of(TestDataGenerator.feedAlarm(AlarmType.COMMENT, new AlarmArgs(account.getId(), account.getNickname()), TEST_FEED)));
 
         given(feedAlarmRepository.findAllByFeed_Account_Id(eq(account.getId()), eq(pageable))).willReturn(expected);
 
@@ -122,8 +123,8 @@ class FeedAlarmServiceTest {
 
     private static Stream<Arguments> saveTestParams() {
         return Stream.of(
-                Arguments.of(AlarmType.COMMENT, new AlarmArgs(TESTER.getId())),
-                Arguments.of(AlarmType.FAVORITE, new AlarmArgs(TESTER.getId()))
+                Arguments.of(AlarmType.COMMENT, new AlarmArgs(TESTER.getId(), TESTER.getNickname())),
+                Arguments.of(AlarmType.FAVORITE, new AlarmArgs(TESTER.getId(), TESTER.getNickname()))
         );
     }
 }

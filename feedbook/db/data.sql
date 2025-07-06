@@ -44,29 +44,68 @@ insert into feed_comment(content, feed_id, account_id)
 values ('Commment 3', 2, 2);
 
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('FAVORITE', '{"accountId": 1}', 1);
+values ('FAVORITE', '{
+  "accountId": 1,
+  "accountName": "Tester1"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 1}', 1);
+values ('COMMENT', '{
+  "accountId": 1,
+  "accountName": "Tester1"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 1);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 1);
 
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 2);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 2);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 1}', 1);
+values ('COMMENT', '{
+  "accountId": 1,
+  "accountName": "Tester1"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 1);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 2);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 2);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 1}', 1);
+values ('COMMENT', '{
+  "accountId": 1,
+  "accountName": "Tester1"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 1);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 2);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 2);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 1}', 1);
+values ('COMMENT', '{
+  "accountId": 1,
+  "accountName": "Tester1"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 1);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Tester2"
+}', 1);
 insert into feed_alarm(alarm_type, args, feed_id)
-values ('COMMENT', '{"accountId": 2}', 2);
+values ('COMMENT', '{
+  "accountId": 2,
+  "accountName": "Test2"
+}', 2);
