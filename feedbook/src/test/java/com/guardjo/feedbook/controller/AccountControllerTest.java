@@ -1,7 +1,9 @@
 package com.guardjo.feedbook.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guardjo.feedbook.config.TestSecurityConfig;
+import com.guardjo.feedbook.config.SecurityConfig;
+import com.guardjo.feedbook.config.auth.AccountPrincipal;
+import com.guardjo.feedbook.config.auth.JwtAuthManager;
 import com.guardjo.feedbook.controller.request.LoginRequest;
 import com.guardjo.feedbook.controller.request.SignupRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
@@ -9,6 +11,10 @@ import com.guardjo.feedbook.exception.DuplicateUsernameException;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.service.AccountService;
+import com.guardjo.feedbook.util.JwtProvider;
+import com.guardjo.feedbook.util.TestDataGenerator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,8 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -28,13 +37,17 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AccountController.class)
-@Import(TestSecurityConfig.class)
+@Import(SecurityConfig.class)
 class AccountControllerTest {
+    private final static String TEST_TOKEN = "Bearer testtoken";
+    private final static AccountPrincipal TEST_PRINCIPAL = TestDataGenerator.accountPrincipal(1L, "Tester");
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -42,6 +55,28 @@ class AccountControllerTest {
 
     @MockBean
     private AccountService accountService;
+
+    @MockBean
+    private JwtProvider jwtProvider;
+
+    @MockBean
+    private JwtAuthManager jwtAuthManager;
+
+    @BeforeEach
+    void setUp() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(TEST_PRINCIPAL, TEST_PRINCIPAL, TEST_PRINCIPAL.getAuthorities());
+
+        given(jwtProvider.isExpired(eq(TEST_TOKEN))).willReturn(false);
+        given(jwtProvider.getUsername(eq(TEST_TOKEN))).willReturn(TEST_PRINCIPAL.getAccount().getUsername());
+        given(jwtAuthManager.authenticate(any(Authentication.class))).willReturn(authentication);
+    }
+
+    @AfterEach
+    void tearDown() {
+        then(jwtProvider).should(atLeast(0)).isExpired(eq(TEST_TOKEN));
+        then(jwtProvider).should(atLeast(0)).getUsername(eq(TEST_TOKEN));
+        then(jwtAuthManager).should(atLeast(0)).authenticate(any(Authentication.class));
+    }
 
     @DisplayName("POST : " + UrlContext.SIGNUP_URL + ": 정상")
     @Test
@@ -170,6 +205,23 @@ class AccountControllerTest {
                         .content(content)
                         .with(csrf()))
                 .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("GET : " + UrlContext.AUTH_URL + " : 정상")
+    @Test
+    void test_authenticate() throws Exception {
+        mockMvc.perform(get(UrlContext.AUTH_URL)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_TOKEN))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("GET : " + UrlContext.AUTH_URL + " : 검증 실패")
+    @Test
+    void test_authenticate_unAuthorization() throws Exception {
+        mockMvc.perform(get(UrlContext.AUTH_URL))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 
     private static Stream<Arguments> loginArguments() {
