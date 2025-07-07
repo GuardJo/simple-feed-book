@@ -59,3 +59,19 @@ export async function authenticate(): Promise<BaseResponse<string>> {
 
     return await validateResponse(response)
 }
+
+/**
+ * 로그아웃 API 요청
+ * <hr/>
+ * <i>기존 토큰 만료 처리</i>
+ */
+export async function logout(): Promise<BaseResponse<string>> {
+    const response: Response = await fetch(`${baseUrl}/api/logout`, {
+        method: 'POST',
+        headers: {
+            ...initHeaders(),
+        },
+    })
+
+    return await validateResponse(response)
+}

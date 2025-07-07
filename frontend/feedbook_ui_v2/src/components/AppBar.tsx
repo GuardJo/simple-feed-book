@@ -3,10 +3,11 @@
 import React, {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Menu} from "lucide-react";
-import {cn, getAccessToken} from "@/lib/utils";
+import {cn, getAccessToken, removeAccessToken} from "@/lib/utils";
 import Link from "next/link";
-import {useQuery} from "@tanstack/react-query";
-import {authenticate} from "@/lib/accountApiCaller";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {authenticate, logout} from "@/lib/accountApiCaller";
+import {useRouter} from "next/navigation";
 
 /**
  * App Bar
@@ -15,6 +16,7 @@ export default function AppBar({children}: AppbarProps) {
     const [openSidebar, setOpenSidebar] = useState(false)
     const [hasLogin, setHasLogin] = useState<boolean>(false);
 
+    const router = useRouter()
     const {refetch} = useQuery(
         {
             queryKey: ['authenticate'],
@@ -22,6 +24,20 @@ export default function AppBar({children}: AppbarProps) {
             enabled: false
         }
     )
+
+    const logoutMutation = useMutation({
+        mutationKey: ['logout'],
+        mutationFn: () => logout(),
+        onSuccess: () => {
+            removeAccessToken()
+            setHasLogin(false)
+            setOpenSidebar(false)
+            router.replace("/")
+        },
+        onError: error => {
+            window.alert(error.message);
+        }
+    })
 
     useEffect(() => {
         try {
@@ -44,12 +60,10 @@ export default function AppBar({children}: AppbarProps) {
     }, [hasLogin]);
 
     const handleLogout = () => {
-       const isLogout: boolean = window.confirm("Are you sure you want to logout?")
+        const isLogout: boolean = window.confirm("Are you sure you want to logout?")
 
         if (isLogout) {
-            setOpenSidebar(false)
-            // TODO 로그아웃 API 연동하기
-            console.log('logout')
+            logoutMutation.mutate()
         }
     }
 
