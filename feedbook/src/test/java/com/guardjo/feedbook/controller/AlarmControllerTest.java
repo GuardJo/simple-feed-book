@@ -83,9 +83,9 @@ class AlarmControllerTest {
     @Test
     void test_getAlarms() throws Exception {
         Feed testFeed = TestDataGenerator.feed(1L, "Test", "test", TEST_PRINCIPAL.getAccount());
-        FeedAlarm feedAlarm = TestDataGenerator.feedAlarm(AlarmType.COMMENT, new AlarmArgs(2L), testFeed);
+        FeedAlarm feedAlarm = TestDataGenerator.feedAlarm(AlarmType.COMMENT, new AlarmArgs(2L, "Tester2"), testFeed);
         Page<FeedAlarm> feedAlarms = new PageImpl<>(List.of(feedAlarm), Pageable.ofSize(10), 1);
-        FeedAlarmPageDto expected = FeedAlarmPageDto.from(feedAlarms, TEST_PRINCIPAL.getAccount());
+        FeedAlarmPageDto expected = FeedAlarmPageDto.from(feedAlarms);
 
         given(feedAlarmService.findAllFeedAlarmByAccount(eq(TEST_PRINCIPAL.getAccount()), any(Pageable.class))).willReturn(expected);
 

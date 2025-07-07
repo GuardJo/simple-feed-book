@@ -42,6 +42,8 @@ public class SecurityConfig {
                             .permitAll()
                             .requestMatchers(HttpMethod.OPTIONS)
                             .permitAll()
+                            .requestMatchers("/error")
+                            .permitAll()
                             .anyRequest().authenticated();
                 })
                 .formLogin(AbstractHttpConfigurer::disable)

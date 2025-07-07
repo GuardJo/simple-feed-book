@@ -1,24 +1,22 @@
 package com.guardjo.feedbook.controller.response;
 
-import java.util.List;
-
+import com.guardjo.feedbook.model.domain.FeedAlarm;
 import org.springframework.data.domain.Page;
 
-import com.guardjo.feedbook.model.domain.Account;
-import com.guardjo.feedbook.model.domain.FeedAlarm;
+import java.util.List;
 
 public record FeedAlarmPageDto(
-	long totalSize,
-	int pageNumber,
-	List<FeedAlarmDto> feedAlarms
+        long totalSize,
+        int pageNumber,
+        List<FeedAlarmDto> feedAlarms
 ) {
-	public static FeedAlarmPageDto from(Page<FeedAlarm> feedAlarms, Account account) {
-		return new FeedAlarmPageDto(
-			feedAlarms.getTotalElements(),
-			feedAlarms.getNumber(),
-			feedAlarms.getContent().stream()
-				.map(feedAlarm -> FeedAlarmDto.from(feedAlarm, account))
-				.toList()
-		);
-	}
+    public static FeedAlarmPageDto from(Page<FeedAlarm> feedAlarms) {
+        return new FeedAlarmPageDto(
+                feedAlarms.getTotalElements(),
+                feedAlarms.getNumber(),
+                feedAlarms.getContent().stream()
+                        .map(feedAlarm -> FeedAlarmDto.from(feedAlarm, feedAlarm.getArgs().accountName()))
+                        .toList()
+        );
+    }
 }

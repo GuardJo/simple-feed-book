@@ -120,7 +120,7 @@ public class FeedController implements FeedApiDoc {
         log.info("PUT : {}/{}, username = {}", UrlContext.FAVORITE_FEEDS_URL, feedId, principal.getUsername());
 
         feedService.updateFeedFavorite(feedId, account);
-        feedAlarmService.saveNewAlarm(AlarmType.FAVORITE, new AlarmArgs(account.getId()), feedId);
+        feedAlarmService.saveNewAlarm(AlarmType.FAVORITE, new AlarmArgs(account.getId(), account.getNickname()), feedId);
 
         return BaseResponse.defaultSuccesses();
     }

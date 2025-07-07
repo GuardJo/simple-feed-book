@@ -1,6 +1,7 @@
 package com.guardjo.feedbook.service;
 
 import com.guardjo.feedbook.controller.response.FeedAlarmPageDto;
+import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.AlarmSubscriber;
 import com.guardjo.feedbook.model.domain.Feed;
@@ -38,7 +39,7 @@ public class FeedAlarmService {
     public void saveNewAlarm(AlarmType alarmType, AlarmArgs alarmArgs, long feedId) {
         log.debug("Create new FeedAlarm, type = {}, feedId = {}", alarmType, feedId);
 
-        Feed targetFeed = feedRepository.getReferenceById(feedId);
+        Feed targetFeed = feedRepository.findById(feedId).orElseThrow(() -> new EntityNotFoundException(Feed.class, feedId));
 
         FeedAlarm newAlarm = FeedAlarm.builder()
                 .feed(targetFeed)
@@ -47,7 +48,7 @@ public class FeedAlarmService {
                 .build();
 
         feedAlarmRepository.save(newAlarm);
-        feedNotificationUtil.sendAlarmUpdateEvent(newAlarm.getArgs().accountId());
+        feedNotificationUtil.sendAlarmUpdateEvent(newAlarm);
 
         log.info("Created New FeedAlarm, type = {}, feedId = {}", alarmType, feedId);
     }
@@ -67,7 +68,7 @@ public class FeedAlarmService {
 
         log.info("Found FeedAlarm List, accountId = {}", account.getId());
 
-        return FeedAlarmPageDto.from(feedAlarms, account);
+        return FeedAlarmPageDto.from(feedAlarms);
     }
 
     /**

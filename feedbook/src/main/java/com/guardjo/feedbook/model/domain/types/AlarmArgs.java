@@ -1,6 +1,7 @@
 package com.guardjo.feedbook.model.domain.types;
 
 public record AlarmArgs(
-	long accountId
+        long accountId,
+        String accountName
 ) {
 }
