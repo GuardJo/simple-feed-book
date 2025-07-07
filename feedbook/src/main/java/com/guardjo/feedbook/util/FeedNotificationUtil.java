@@ -1,10 +1,13 @@
 package com.guardjo.feedbook.util;
 
+import com.guardjo.feedbook.controller.response.FeedAlarmDto;
 import com.guardjo.feedbook.model.domain.AlarmSubscriber;
+import com.guardjo.feedbook.model.domain.FeedAlarm;
 import com.guardjo.feedbook.repository.AlarmSubscriberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -18,19 +21,24 @@ public class FeedNotificationUtil {
     /**
      * 알람 이벤트 발송
      *
-     * @param accountId 알람 이벤트 수신 계정 식별키
+     * @param feedAlarm 피드 알림 Entity
      */
-    public void sendAlarmUpdateEvent(Long accountId) {
-        log.debug("Send Alarm Event, accountId = {}", accountId);
+    public void sendAlarmUpdateEvent(FeedAlarm feedAlarm) {
+        Long accountId = feedAlarm.getFeed().getAccount().getId();
+        log.debug("Send Alarm Event, accountId = {}, feedId = {}", accountId, feedAlarm.getFeed().getId());
         AlarmSubscriber subscriber = alarmSubscriberRepository.getClient(accountId);
 
-        if (Objects.nonNull(subscriber)) {
-            try {
-                subscriber.send("Update Alarm");
-            } catch (IOException e) {
-                log.warn("Failed to send Alarm Event, accountId = {}", accountId);
-                alarmSubscriberRepository.deleteClient(accountId);
-            }
+        FeedAlarmDto feedAlarmDto = FeedAlarmDto.from(feedAlarm, feedAlarm.getArgs().accountName());
+
+        try {
+            SseEmitter.SseEventBuilder eventBuilder = SseEmitter.event()
+                    .name("message")
+                    .data(feedAlarmDto.alarmText())
+                    .reconnectTime(30_000);
+            subscriber.send(eventBuilder);
+        } catch (IOException e) {
+            log.warn("Failed to send Alarm Event, accountId = {}", accountId);
+            alarmSubscriberRepository.deleteClient(accountId);
         }
     }
 
@@ -48,10 +56,6 @@ public class FeedNotificationUtil {
 
         if (Objects.isNull(subscriber)) {
             subscriber = alarmSubscriberRepository.addClient(accountId);
-        } else {
-            subscriber.onCompletion(() -> alarmSubscriberRepository.deleteClient(accountId));
-            subscriber.onTimeout(() -> alarmSubscriberRepository.deleteClient(accountId));
-            subscriber.onError((e) -> alarmSubscriberRepository.deleteClient(accountId));
         }
 
         return subscriber;

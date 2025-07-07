@@ -48,7 +48,7 @@ public class FeedAlarmService {
                 .build();
 
         feedAlarmRepository.save(newAlarm);
-        feedNotificationUtil.sendAlarmUpdateEvent(targetFeed.getAccount().getId());
+        feedNotificationUtil.sendAlarmUpdateEvent(newAlarm);
 
         log.info("Created New FeedAlarm, type = {}, feedId = {}", alarmType, feedId);
     }

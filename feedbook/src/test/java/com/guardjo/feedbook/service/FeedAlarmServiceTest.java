@@ -58,7 +58,7 @@ class FeedAlarmServiceTest {
         ArgumentCaptor<FeedAlarm> argumentCaptor = ArgumentCaptor.forClass(FeedAlarm.class);
         given(feedRepository.findById(eq(feedId))).willReturn(Optional.of(TEST_FEED));
         given(feedAlarmRepository.save(argumentCaptor.capture())).willReturn(mock(FeedAlarm.class));
-        willDoNothing().given(feedNotificationUtil).sendAlarmUpdateEvent(eq(alarmArgs.accountId()));
+        willDoNothing().given(feedNotificationUtil).sendAlarmUpdateEvent(any(FeedAlarm.class));
 
         assertThatCode(() -> feedAlarmService.saveNewAlarm(alarmType, alarmArgs, feedId))
                 .doesNotThrowAnyException();
@@ -71,7 +71,7 @@ class FeedAlarmServiceTest {
 
         then(feedRepository).should().findById(eq(feedId));
         then(feedAlarmRepository).should().save(any(FeedAlarm.class));
-        then(feedNotificationUtil).should().sendAlarmUpdateEvent(eq(alarmArgs.accountId()));
+        then(feedNotificationUtil).should().sendAlarmUpdateEvent(eq(actual));
     }
 
     @DisplayName("계정별 피드 알림 조회")
