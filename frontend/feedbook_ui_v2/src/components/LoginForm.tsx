@@ -2,10 +2,10 @@
 
 import FocusingInput from "@/components/FocusingInput";
 import Link from "next/link";
-import {FormEvent} from "react";
+import {FormEvent, useEffect} from "react";
 import {login, LoginRequest} from "@/lib/accountApiCaller";
 import {useMutation} from "@tanstack/react-query";
-import {setAccessToken} from "@/lib/utils";
+import {getAccessToken, setAccessToken} from "@/lib/utils";
 import {useRouter} from "next/navigation";
 
 /**
@@ -25,6 +25,19 @@ export default function LoginForm() {
             }
         }
     )
+
+    useEffect(() => {
+        // 이미 로그인한 사용자는 로그인페이지 접근 시 이전 페이지로 강제 이동
+        try {
+            const token = getAccessToken()
+
+            if (token !== '' && token !== null && token !== undefined) {
+                router.back()
+            }
+        } catch {
+            return
+        }
+    }, [router]);
 
     const handleLogin = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault()

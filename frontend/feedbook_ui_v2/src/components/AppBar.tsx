@@ -48,7 +48,7 @@ export default function AppBar({children}: AppbarProps) {
             } else {
                 setHasLogin(false)
             }
-        } catch (e) {
+        } catch {
             setHasLogin(false)
         }
     }, [openSidebar]);
