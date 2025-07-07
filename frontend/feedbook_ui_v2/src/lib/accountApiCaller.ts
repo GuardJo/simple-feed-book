@@ -1,5 +1,5 @@
 import {BaseResponse} from "@/lib/models";
-import {validateResponse} from "@/lib/utils";
+import {initHeaders, validateResponse} from "@/lib/utils";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_SERVER_URL
 
@@ -42,6 +42,20 @@ export async function login(request: LoginRequest): Promise<BaseResponse<string>
         },
         body: JSON.stringify(request)
     });
+
+    return await validateResponse(response)
+}
+
+/**
+ * 현재 접속 사용자 검증 요청
+ */
+export async function authenticate(): Promise<BaseResponse<string>> {
+    const response: Response = await fetch(`${baseUrl}/api/auth`, {
+        method: 'GET',
+        headers: {
+            ...initHeaders(),
+        },
+    })
 
     return await validateResponse(response)
 }

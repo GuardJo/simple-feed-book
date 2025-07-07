@@ -304,5 +304,19 @@ export const handlers = [
                 }
             })
         }
+    }),
+    http.get(`${mockUrl}/api/auth`, ({request}) => {
+        const token = request.headers.get(AUTHORIZATION_HEADER_NAME)
+
+        if (token === null) {
+            return new HttpResponse("Unauthorized", {
+                status: 401
+            })
+        } else {
+            return HttpResponse.json({
+                status: 'OK',
+                body: 'SUCCESSES'
+            })
+        }
     })
 ]
