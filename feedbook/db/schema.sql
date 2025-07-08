@@ -39,22 +39,26 @@ create table account_favorite_feed
             references feed
 );
 
-create table feed_comment (
-                              id bigint not null default nextval('feed_comment_id_seq') primary key,
-                              created_at timestamp(6) default current_timestamp,
-                              modified_at timestamp(6) default current_timestamp,
-                              content varchar(500) not null,
-                              feed_id bigint not null constraint feed_comment_feed_id_fk references feed,
-                              account_id bigint not null constraint feed_comment_account_id_fk references account
+create table feed_comment
+(
+    id          bigint       not null default nextval('feed_comment_id_seq') primary key,
+    created_at  timestamp(6)          default current_timestamp,
+    modified_at timestamp(6)          default current_timestamp,
+    content     varchar(500) not null,
+    feed_id     bigint       not null
+        constraint feed_comment_feed_id_fk references feed,
+    account_id  bigint       not null
+        constraint feed_comment_account_id_fk references account
 );
 
-create table feed_alarm(
-                           id bigint default nextval('feed_alarm_id_seq') not null primary key ,
-                           alarm_type varchar(50) not null ,
-                           args jsonb not null,
-                           created_at timestamp(6) default current_timestamp ,
-                           modified_at timestamp(6) default current_timestamp ,
-                           feed_id bigint
-                               constraint "feed_alarm_feed_id_fk"
-                               references feed
+create table feed_alarm
+(
+    id          bigint       default nextval('feed_alarm_id_seq') not null primary key,
+    alarm_type  varchar(50)                                       not null,
+    args        jsonb                                             not null,
+    created_at  timestamp(6) default current_timestamp,
+    modified_at timestamp(6) default current_timestamp,
+    feed_id     bigint
+        constraint "feed_alarm_feed_id_fk"
+            references feed
 )
