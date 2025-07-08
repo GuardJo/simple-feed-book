@@ -1,16 +1,71 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Menu} from "lucide-react";
-import {cn} from "@/lib/utils";
+import {cn, getAccessToken, removeAccessToken} from "@/lib/utils";
 import Link from "next/link";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {authenticate, logout} from "@/lib/accountApiCaller";
+import {useRouter} from "next/navigation";
 
 /**
  * App Bar
  */
 export default function AppBar({children}: AppbarProps) {
     const [openSidebar, setOpenSidebar] = useState(false)
+    const [hasLogin, setHasLogin] = useState<boolean>(false);
+
+    const router = useRouter()
+    const {refetch} = useQuery(
+        {
+            queryKey: ['authenticate'],
+            queryFn: () => authenticate(),
+            enabled: false
+        }
+    )
+
+    const logoutMutation = useMutation({
+        mutationKey: ['logout'],
+        mutationFn: () => logout(),
+        onSuccess: () => {
+            removeAccessToken()
+            setHasLogin(false)
+            setOpenSidebar(false)
+            router.replace("/")
+        },
+        onError: error => {
+            window.alert(error.message);
+        }
+    })
+
+    useEffect(() => {
+        try {
+            const token: string = getAccessToken()
+
+            if (token !== '' && token !== undefined && token !== null) {
+                setHasLogin(true)
+            } else {
+                setHasLogin(false)
+            }
+        } catch {
+            setHasLogin(false)
+        }
+    }, [openSidebar]);
+
+    useEffect(() => {
+        if (hasLogin) {
+            refetch()
+        }
+    }, [hasLogin]);
+
+    const handleLogout = () => {
+        const isLogout: boolean = window.confirm("Are you sure you want to logout?")
+
+        if (isLogout) {
+            logoutMutation.mutate()
+        }
+    }
 
     return (
         <>
@@ -50,10 +105,17 @@ export default function AppBar({children}: AppbarProps) {
                         <div className="mt-auto p-4">
                             <Button asChild
                                     className="w-full bg-gray-100 hover:bg-gray-300 text-black">
-                                <Link href="/login" className="flex justify-center items-center"
-                                      onClick={() => setOpenSidebar(false)}>
-                                    Login
-                                </Link>
+                                {hasLogin ?
+                                    <Link href="#" className="flex justify-center items-center"
+                                          onClick={() => handleLogout()}>
+                                        Logout
+                                    </Link>
+                                    :
+                                    <Link href="/login" className="flex justify-center items-center"
+                                          onClick={() => setOpenSidebar(false)}>
+                                        Login
+                                    </Link>
+                                }
                             </Button>
                         </div>
                     </nav>

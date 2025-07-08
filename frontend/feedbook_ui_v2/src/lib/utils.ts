@@ -30,6 +30,13 @@ export function getAccessToken(): string {
 }
 
 /**
+ * 저장된 토큰을 제거한다.
+ */
+export function removeAccessToken(): void {
+    localStorage.removeItem(tokenName)
+}
+
+/**
  * 인증 토큰을 헤더에 추가하여 반환한다.
  */
 export function initHeaders(): HeadersInit {

@@ -1,17 +1,17 @@
 package com.guardjo.feedbook.controller;
 
+import com.guardjo.feedbook.config.auth.AccountPrincipal;
 import com.guardjo.feedbook.controller.docs.AccountApiDoc;
 import com.guardjo.feedbook.controller.request.LoginRequest;
 import com.guardjo.feedbook.controller.request.SignupRequest;
 import com.guardjo.feedbook.controller.response.BaseResponse;
+import com.guardjo.feedbook.exception.CustomAuthenticationException;
 import com.guardjo.feedbook.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -55,5 +55,25 @@ public class AccountController implements AccountApiDoc {
                 .body(token)
                 .status(HttpStatus.OK.name())
                 .build();
+    }
+
+    @GetMapping(UrlContext.AUTH_URL)
+    @Override
+    public BaseResponse<String> authenticate(@AuthenticationPrincipal AccountPrincipal principal) {
+        if (Objects.isNull(principal)) {
+            throw new CustomAuthenticationException("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        return BaseResponse.defaultSuccesses();
+    }
+
+    @PostMapping(UrlContext.LOGOUT_URL)
+    @Override
+    public BaseResponse<String> logout(@AuthenticationPrincipal AccountPrincipal principal) {
+        if (Objects.nonNull(principal)) {
+            accountService.logout(principal);
+        }
+
+        return BaseResponse.defaultSuccesses();
     }
 }

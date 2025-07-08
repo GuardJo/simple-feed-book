@@ -42,12 +42,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 log.warn("Expired Token");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
-                String username = jwtProvider.getUsername(token);
-                Authentication authentication = jwtAuthManager.authenticate(new UsernamePasswordAuthenticationToken(username, username));
+                try {
+                    String username = jwtProvider.getUsername(token);
+                    Authentication authentication = jwtAuthManager.authenticate(new UsernamePasswordAuthenticationToken(username, username));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
             }
         }
+
         filterChain.doFilter(request, response);
     }
 
