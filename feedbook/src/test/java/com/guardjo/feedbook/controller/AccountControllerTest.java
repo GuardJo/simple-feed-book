@@ -224,6 +224,20 @@ class AccountControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @DisplayName("POST : " + UrlContext.LOGOUT_URL + " : 정상")
+    @Test
+    void test_logout() throws Exception {
+        willDoNothing().given(accountService).logout(eq(TEST_PRINCIPAL));
+
+        mockMvc.perform(post(UrlContext.LOGOUT_URL)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_TOKEN)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        then(accountService).should().logout(eq(TEST_PRINCIPAL));
+    }
+
     private static Stream<Arguments> loginArguments() {
         return Stream.of(
                 Arguments.of(EntityNotFoundException.class, HttpStatus.NOT_FOUND),

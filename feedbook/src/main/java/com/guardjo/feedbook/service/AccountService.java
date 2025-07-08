@@ -1,11 +1,13 @@
 package com.guardjo.feedbook.service;
 
+import com.guardjo.feedbook.config.auth.AccountPrincipal;
 import com.guardjo.feedbook.exception.DuplicateUsernameException;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.AccountCache;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.repository.cache.AccountAccessInfoRepository;
 import com.guardjo.feedbook.repository.cache.AccountCacheRepository;
 import com.guardjo.feedbook.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.util.Optional;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountCacheRepository accountCacheRepository;
+    private final AccountAccessInfoRepository accessInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
@@ -59,7 +62,7 @@ public class AccountService {
      * @throws com.guardjo.feedbook.exception.EntityNotFoundException 해당하는 아이디의 계정이 없을 때
      * @throws com.guardjo.feedbook.exception.WrongPasswordException  해당하는 계정의 비밀번호가 올바르지 않을 때
      */
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public String login(String username, String password) {
         Account account = findAccount(username);
 
@@ -96,6 +99,17 @@ public class AccountService {
         saveNewAccountCache(account);
 
         return account;
+    }
+
+    /**
+     * 주어진 인증객체에 대한 접속 정보를 초기화하여 로그아웃 처리한다.
+     *
+     * @param principal 사용자 인증 정보
+     */
+    public void logout(AccountPrincipal principal) {
+        log.debug("Logout Account, username = {}", principal.getUsername());
+
+        accessInfoRepository.deleteById(principal.getUsername());
     }
 
     private String createJwtToken(Account account) {

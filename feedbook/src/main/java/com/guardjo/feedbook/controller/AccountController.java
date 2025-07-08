@@ -66,4 +66,14 @@ public class AccountController implements AccountApiDoc {
 
         return BaseResponse.defaultSuccesses();
     }
+
+    @PostMapping(UrlContext.LOGOUT_URL)
+    @Override
+    public BaseResponse<String> logout(@AuthenticationPrincipal AccountPrincipal principal) {
+        if (Objects.nonNull(principal)) {
+            accountService.logout(principal);
+        }
+
+        return BaseResponse.defaultSuccesses();
+    }
 }

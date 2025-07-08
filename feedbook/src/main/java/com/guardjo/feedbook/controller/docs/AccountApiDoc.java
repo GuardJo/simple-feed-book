@@ -17,4 +17,7 @@ public interface AccountApiDoc {
 
     @Operation(summary = "사용자 검증", description = "로그인한 사용자의 토큰 정보를 검증한다.")
     BaseResponse<String> authenticate(AccountPrincipal principal);
+
+    @Operation(summary = "로그아웃", description = "기존 로그인된 사용자의 토큰을 만료시킨다.")
+    BaseResponse<String> logout(AccountPrincipal principal);
 }

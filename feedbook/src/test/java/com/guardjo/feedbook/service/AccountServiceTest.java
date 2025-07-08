@@ -1,11 +1,13 @@
 package com.guardjo.feedbook.service;
 
+import com.guardjo.feedbook.config.auth.AccountPrincipal;
 import com.guardjo.feedbook.exception.DuplicateUsernameException;
 import com.guardjo.feedbook.exception.EntityNotFoundException;
 import com.guardjo.feedbook.exception.WrongPasswordException;
 import com.guardjo.feedbook.model.domain.Account;
 import com.guardjo.feedbook.model.domain.AccountCache;
 import com.guardjo.feedbook.repository.AccountRepository;
+import com.guardjo.feedbook.repository.cache.AccountAccessInfoRepository;
 import com.guardjo.feedbook.repository.cache.AccountCacheRepository;
 import com.guardjo.feedbook.util.JwtProvider;
 import com.guardjo.feedbook.util.TestDataGenerator;
@@ -32,6 +34,8 @@ class AccountServiceTest {
     private AccountRepository accountRepository;
     @Mock
     private AccountCacheRepository accountCacheRepository;
+    @Mock
+    private AccountAccessInfoRepository accessInfoRepository;
     @Mock
     private JwtProvider jwtProvider;
 
@@ -214,5 +218,18 @@ class AccountServiceTest {
         then(accountCacheRepository).should().findById(eq(username));
         then(accountRepository).should().findByUsername(eq(username));
         then(accountCacheRepository).should().save(any(AccountCache.class));
+    }
+
+    @DisplayName("로그아웃 요청 처리")
+    @Test
+    void test_logout() {
+        AccountPrincipal principal = TestDataGenerator.accountPrincipal(1L, "Tester");
+
+        willDoNothing().given(accessInfoRepository).deleteById(eq(principal.getUsername()));
+
+        assertThatCode(() -> accountService.logout(principal))
+                .doesNotThrowAnyException();
+
+        then(accessInfoRepository).should().deleteById(eq(principal.getUsername()));
     }
 }
