@@ -8,6 +8,7 @@ const config: StorybookConfig = {
     "addons": [
         "@storybook/addon-essentials",
         "@storybook/addon-onboarding",
+        "@storybook/addon-actions",
         "@chromatic-com/storybook"
     ],
     "framework": {

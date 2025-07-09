@@ -57,6 +57,9 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.0
+      '@storybook/addon-actions':
+        specifier: 8.6.8
+        version: 8.6.8(storybook@8.6.8)
       '@storybook/addon-essentials':
         specifier: 8.6.8
         version: 8.6.8(@types/react@19.0.12)(storybook@8.6.8)
