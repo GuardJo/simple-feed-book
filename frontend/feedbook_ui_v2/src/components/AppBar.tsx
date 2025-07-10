@@ -56,6 +56,13 @@ export default function AppBar({children}: AppbarProps) {
     useEffect(() => {
         if (hasLogin) {
             refetch()
+                .then((result) => {
+                    if (result.isError) {
+                        removeAccessToken()
+                        router.replace("/login")
+                        setHasLogin(false)
+                    }
+                })
         }
     }, [hasLogin]);
 
