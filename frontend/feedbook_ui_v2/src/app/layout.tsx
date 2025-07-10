@@ -16,8 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Simple Feed Book",
+    title: "Feedbook",
     description: "Simple SNS Project",
+    icons: '/images/icon.png'
 };
 
 export default function RootLayout({
