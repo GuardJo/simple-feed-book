@@ -290,3 +290,6 @@ FEED_COMMENT o{--|| Account: accountId
 
 Feed_Alarm o{--|| Feed: feedId
 ```
+
+# 참조
+[아이콘 제작자: riajulislam - Flaticon](https://www.flaticon.com/kr/search?word=%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%B6%81)
