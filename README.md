@@ -26,6 +26,36 @@
         - 작성 피드의 신규 댓글 알림
         - 좋아요 알림
 
+# server 모듈 의존성
+
+- java 17
+- spring-boot 3.1.6
+  - spring-data-jpa
+  - spring-data-redis
+  - spring-web
+  - spring-security
+  - spring-configuration-processor
+  - spring-devtool
+  - spring-docker-compose
+- postgres 16
+- redis 7.2.5
+- lombok
+
+## 테스트 환경
+
+- spring-boot 3.1.6
+  - spring-boot-test
+  - spring-security-test
+  - testcontainers
+
+# 필요 환경 변수
+- `JWT_SECRET_KEY` : JWT 토큰 발급 및 검증을 위한 키
+- `POSTGRES_JDBC_URL` : 배포 환경의 postgres DB에 대한 jdbc_url
+- `POSTGRES_USERNAME` : 배포 환경의 postgres DB에 대한 사용자명
+- `POSTGRES_PASSWORD` : 배포 환경의 postgres DB에 대한 접근 패스워드
+- `REDIS_HOST` : 배포 환경의 redis host명
+- `REDIS_PORT` : 배포 환경의 redis port 번호
+
 # 수행 흐름
 
 ## 피드 조회 요청
@@ -260,25 +290,3 @@ FEED_COMMENT o{--|| Account: accountId
 
 Feed_Alarm o{--|| Feed: feedId
 ```
-
-# server 모듈 의존성
-
-- java 17
-- spring-boot 3.1.6
-    - spring-data-jpa
-    - spring-data-redis
-    - spring-web
-    - spring-security
-    - spring-configuration-processor
-    - spring-devtool
-    - spring-docker-compose
-- postgres 16
-- redis 7.2.5
-- lombok
-
-## 테스트 환경
-
-- spring-boot 3.1.6
-    - spring-boot-test
-    - spring-security-test
-    - testcontainers
