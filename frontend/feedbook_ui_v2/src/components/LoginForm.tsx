@@ -17,8 +17,14 @@ export default function LoginForm() {
             mutationKey: ["login"],
             mutationFn: (req: LoginRequest) => login(req),
             onSuccess: data => {
-                setAccessToken(data.body)
-                router.push("/")
+                if (data.status === "OK") {
+                    setAccessToken(data.body)
+                    router.push("/")
+                } else if (data.status === "NOT_FOUND") {
+                    window.alert('해당 계정 정보를 찾을 수 없습니다.')
+                } else {
+                    window.alert(data.body)
+                }
             },
             onError: error => {
                 window.alert(error.message)
